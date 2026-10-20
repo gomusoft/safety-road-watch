@@ -59,10 +59,13 @@ Clip offsets shown in the library are computed from the clip file name against t
 - `gradle assembleDebug` (no wrapper; CI pins Gradle 8.14.3 via `gradle/actions/setup-gradle`).
 - `app/debug.keystore` is committed on purpose (public, debug only) so every build signs with the same key
   and installs over the previous one without losing data. It is **not** a release key.
-- `.github/workflows/apk.yml`:
-  - every push and PR: unit tests + debug APK, uploaded as a workflow artifact;
-  - push to `main`: replaces the `latest` pre-release (one stable download link);
+- `.github/workflows/apk.yml` (code changes only; docs-only changes skip it):
+  - every PR, and a manual run on any branch (Actions → apk → Run workflow): unit tests + debug APK as a 7-day artifact;
+  - push to `dev`: replaces the `dev-latest` pre-release (the owner's test build, one fixed link);
+  - push to `main`: replaces the `latest` pre-release;
   - push of a tag `vX.Y.Z`: creates a versioned release whose notes are the matching section of `CHANGELOG.md`.
+- Branch model `dev-main`: work → `dev` (squash PR) → `main` (promotion PR, merge commit). The standard dev-pose
+  release workflow (standard 10) is not built yet; see the roadmap.
 - `versionCode` = CI run number; `versionName` = the tag without `v`, or `dev.<run>` for untagged builds.
 - Process: [CONTRIBUTING.md](../CONTRIBUTING.md#releasing).
 

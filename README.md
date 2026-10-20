@@ -1,5 +1,7 @@
 # Safety Road Watch
 
+Lane: `direct` · Cost: none (no server; GitHub Actions is free for public repos)
+
 **ถนนที่ปลอดภัย เริ่มจากคนธรรมดาที่ไม่นิ่งเฉย**
 
 ทุกวันบนถนนเมืองไทยเราเห็นรถฝ่าไฟแดง ปาดเส้นทึบ ปล่อยควันดำ หรือดัดแปลงล้อจนล้นตัวถัง
@@ -34,7 +36,8 @@ Safety Road Watch ทำให้คนขับธรรมดาช่วย�
 
 ## ดาวน์โหลด APK
 - **รุ่นเสถียร:** [Releases](https://github.com/gomusoft/safety-road-watch/releases) (เช่น v0.1.0) พร้อมบันทึกการเปลี่ยนแปลง
-- **รุ่นทดสอบล่าสุด:** [latest](https://github.com/gomusoft/safety-road-watch/releases/download/latest/safety-road-watch.apk) สร้างใหม่ทุกครั้งที่มีการ merge เข้า `main`
+- **รุ่นทดสอบจาก `dev`:** [dev-latest](https://github.com/gomusoft/safety-road-watch/releases/download/dev-latest/safety-road-watch.apk) สร้างใหม่ทุกครั้งที่มีการ merge เข้า `dev`
+- **รุ่นล่าสุดจาก `main`:** [latest](https://github.com/gomusoft/safety-road-watch/releases/download/latest/safety-road-watch.apk)
 
 ทุกรุ่นเซ็นด้วยใบรับรองตัวเดียวกัน จึงติดตั้งทับได้โดยข้อมูลไม่หาย
 

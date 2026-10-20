@@ -17,6 +17,15 @@ Feedback from the owner's real phone beats guessing: ask what they saw before ch
    locking the screen does not stop the dashcam.
 5. **`MediaSession`** so Bluetooth media buttons always reach the app.
 
+## Repo and process (owner asked, not started)
+
+- **Promote and release workflow (dev-pose standard 10):** `release` workflow on `dev` with `dry_run` first, version
+  chosen by the owner (patch / minor / major), bilingual notes from dev-pose `templates/release/`, then merge to `main`
+  with a merge commit, tag and GitHub Release. Replaces the interim tag-push release in `apk.yml`. Start only when the
+  owner says the `dev` build is good.
+- **Branch protection** for `dev` and `main` (owner, GitHub settings), or dev-pose `tools/repo-setup/protect-branches.sh`.
+- **Discord** channels when the owner picks a server (dev-pose standard 04, skill `discord-project-management`).
+
 ## Later
 
 - Stop the voice note by saying "บันทึกเลย" (needs streaming recognition, which opens the mic through the recogniser).

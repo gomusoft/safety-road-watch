@@ -71,4 +71,7 @@ one press, a short spoken note, keep driving. Review and send it after parking.
 | 2026-10-20 | Plate OCR from video frames deferred: plate comes from the voice note in the MVP | Lead agent |
 | 2026-10-20 | Public repo, license **CC BY-NC-SA 4.0**: free, no commercial use, derivatives must stay open under the same license | Owner |
 | 2026-10-20 | Releases: rolling `latest` build from `main` plus versioned tags `vX.Y.Z` with notes from `CHANGELOG.md` | Owner |
+| 2026-10-20 | Follows dev-pose standards v0.5.0, class `personal`. Branch model `dev-main`: the owner tests from `dev` before anything is promoted to `main` and released | Owner |
+| 2026-10-20 | CI publishes an APK from `dev` automatically (`dev-latest`); any branch can be built by hand | Owner |
+| 2026-10-20 | Discord reporting skipped for now (public project; owner will choose a personal or public server later) | Owner |
 | 2026-10-20 | Agent team: an Opus-class lead designs and reviews; cheaper models (Sonnet) write the code, to save tokens | Owner |
