@@ -48,6 +48,7 @@ one press, a short spoken note, keep driving. Review and send it after parking.
 | R8 | Spoken confirmation (TTS) of what was saved | Built |
 | R9 | Library: list events, replay voice, play each clip, choose clips, **merge** chosen clips into one MP4, share clips + a ready-made Thai report text with a Google Maps link, delete | Built |
 | R10 | Record time and GPS location with each event | Built |
+| R12 | Place per event: road, kilometer marker, tambon, amphoe, province. Fetched on demand from the GPS point (phone geocoder), km also from the voice note, all editable | Built, not field-tested |
 | R11 | CI builds an installable APK on every push; the phone downloads it from one link | Built |
 
 ## Non-goals (for now)
@@ -74,4 +75,6 @@ one press, a short spoken note, keep driving. Review and send it after parking.
 | 2026-10-20 | Follows dev-pose standards v0.5.0, class `personal`. Branch model `dev-main`: the owner tests from `dev` before anything is promoted to `main` and released | Owner |
 | 2026-10-20 | CI publishes an APK from `dev` automatically (`dev-latest`); any branch can be built by hand | Owner |
 | 2026-10-20 | Discord reporting skipped for now (public project; owner will choose a personal or public server later) | Owner |
+| 2026-10-20 | Address (road, tambon, amphoe, province) is fetched only when the user presses a button, never automatically: the phone geocoder sends the coordinate to the map service over the internet, which breaks "nothing leaves the phone" if done silently. Kilometer marker comes from the voice note or typing: the phone geocoder does not return it, and speaking while driving is not required (the owner does not always know where they are), so GPS fills the rest. The library shows the coordinate and labels each value as from GPS, voice or edited. Merged video stays in the app until the user saves it to the gallery | Lead agent from owner request, owner to confirm |
+| 2026-10-20 | Capture button on the camera screen: 50% transparent green with a shield, calm and not alarming | Owner |
 | 2026-10-20 | Agent team: an Opus-class lead designs and reviews; cheaper models (Sonnet) write the code, to save tokens | Owner |

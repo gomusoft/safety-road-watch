@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -16,6 +17,29 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+class Place(
+    val road: String? = null,
+    val km: String? = null,
+    val tambon: String? = null,
+    val amphoe: String? = null,
+    val changwat: String? = null,
+    /** Where each field came from: "gps", "voice" or "manual". */
+    val src: Map<String, String> = emptyMap(),
+) {
+    fun value(k: String) = when (k) {
+        "road" -> road
+        "km" -> km
+        "tambon" -> tambon
+        "amphoe" -> amphoe
+        else -> changwat
+    }
+
+    /** One line for lists and the report, e.g. "ถนนมิตรภาพ กม.45 ต.ในเมือง อ.เมือง จ.ขอนแก่น". */
+    fun text(): String = listOfNotNull(
+        road, km?.let { "กม.$it" }, tambon?.let { "ต.$it" }, amphoe?.let { "อ.$it" }, changwat?.let { "จ.$it" },
+    ).joinToString(" ")
+}
+
 class EventInfo(
     val dir: File,
     val time: Long,
@@ -27,6 +51,7 @@ class EventInfo(
     val province: String?,
     val violations: List<String>,
     val note: String,
+    val place: Place,
 )
 
 class EventStore(context: Context) {
@@ -136,6 +161,37 @@ class EventStore(context: Context) {
             j.str("transcript") ?: "", j.str("plate"), j.str("province"),
             if (v == null) emptyList() else (0 until v.length()).map { v.getString(it) },
             j.str("note") ?: "",
+            Place(
+                j.str("road"), j.str("km"), j.str("tambon"), j.str("amphoe"), j.str("changwat"),
+                j.optJSONObject("place_src")?.let { o -> o.keys().asSequence().associateWith { o.getString(it) } } ?: emptyMap(),
+            ),
+        )
+    }
+
+    fun savePlace(dir: File, p: Place) = update(dir) {
+        for ((k, v) in listOf("road" to p.road, "km" to p.km, "tambon" to p.tambon, "amphoe" to p.amphoe, "changwat" to p.changwat))
+            put(k, v?.takeIf { it.isNotBlank() } ?: JSONObject.NULL)
+        put("place_src", JSONObject(p.src.filterKeys { p.value(it) != null }))
+    }
+
+    /**
+     * Road, tambon, amphoe and province for a coordinate, through the phone's geocoder.
+     * Needs internet and sends the coordinate to the phone's map service, so only call it when the user asks.
+     * Blocking: call off the main thread. Null when nothing was found.
+     */
+    @Suppress("DEPRECATION")
+    fun lookupPlace(lat: Double, lon: Double): Place? {
+        if (!Geocoder.isPresent()) return null
+        val a = Geocoder(ctx, Locale("th", "TH")).getFromLocation(lat, lon, 1)?.firstOrNull() ?: return null
+        val clean = { s: String? ->
+            s?.replace(Regex("^(ตำบล|อำเภอ|จังหวัด|แขวง|เขต|ต\\.|อ\\.|จ\\.)\\s*"), "")?.trim()?.takeIf { it.isNotEmpty() }
+        }
+        return Place(
+            road = a.thoroughfare?.trim()?.takeIf { it.isNotEmpty() },
+            tambon = clean(a.subLocality ?: a.locality),
+            amphoe = clean(a.subAdminArea),
+            changwat = clean(a.adminArea),
+            src = mapOf("road" to "gps", "tambon" to "gps", "amphoe" to "gps", "changwat" to "gps"),
         )
     }
 

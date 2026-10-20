@@ -1,6 +1,6 @@
 package watch.saferoad
 
-data class Parsed(val plate: String?, val province: String?, val violations: List<String>)
+data class Parsed(val plate: String?, val province: String?, val violations: List<String>, val km: String? = null)
 
 private val CONSONANTS = listOf(
     "กอไก่" to "ก", "ขอไข่" to "ข", "ฃอขวด" to "ฃ", "คอควาย" to "ค", "ฅอคน" to "ฅ",
@@ -21,6 +21,8 @@ private val CONSONANT_RES = CONSONANTS.map { (name, c) ->
 
 private val PLATE = Regex("""(?<![ก-๛])(\d?[ก-ฮ]{1,2})\s*(\d{1,4})""")
 private val GLUE = Regex("""(?<=[ก-ฮ0-9])\s+(?=[ก-ฮ0-9])""")
+// "กิโลเมตรที่ 45", "หลักกิโล 12+500", "กม. 7"
+private val KM = Regex("""(?:กิโลเมตร|หลักกิโล|กิโล|กม\.?)(?:ที่)?\s*(\d{1,4}(?:\s*\+\s*\d{1,3})?)""")
 private val FILLER = Regex("บันทึก(เลย)?")
 
 // First line item is the canonical name, the rest are aliases.
@@ -155,5 +157,7 @@ fun parse(text: String): Parsed {
     }
     val violations = found.sortedBy { it.first }.map { it.second }.distinct()
 
-    return Parsed(plate, best?.third, violations)
+    val km = KM.find(t)?.groupValues?.get(1)?.replace(" ", "")
+
+    return Parsed(plate, best?.third, violations, km)
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Safety Road Watch</string>
-    <string name="btn_catch">🚨 จับ!</string>
+    <string name="btn_catch">🛡️ บันทึก</string>
     <string name="btn_library">คลัง</string>
     <string name="status_ready">พร้อม: กดปุ่ม หรือปุ่มเสียง/รีโมทบลูทูธ เมื่อเห็นการทำผิด</string>
 </resources>

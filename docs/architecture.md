@@ -25,7 +25,7 @@ press / BT key ─┤ trigger
 filesDir/events/<yyyyMMdd_HHmmss>/
     clip_<startMillis>.mp4   ← ring segments from the last ~35 s, then new ones until +30 s
     voice.wav                ← mic on only from the press until the second press or 12 s
-    event.json               ← time, lat/lon, transcript, plate, province, violations, note
+    event.json               ← time, lat/lon, transcript, plate, province, violations, km, road, tambon, amphoe, changwat, note
     merged.mp4               ← optional, made in the library
 ```
 
@@ -45,7 +45,7 @@ Transcription runs after the note is recorded, from the PCM file, so the recogni
   "note": ""
 }
 ```
-`lat`, `lon`, `plate`, `province` may be `null`. `note` holds a human-readable problem (e.g. transcription failed).
+`lat`, `lon`, `plate`, `province` and the place fields (`km`, `road`, `tambon`, `amphoe`, `changwat`) may be `null`. The place fields are filled by the library's "fetch address" button (`Geocoder`, needs internet), by hand, or `km` from the voice note. `note` holds a human-readable problem (e.g. transcription failed).
 Clip offsets shown in the library are computed from the clip file name against the folder time.
 
 ## Storage and privacy

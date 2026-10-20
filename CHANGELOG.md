@@ -6,8 +6,24 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 
 ## [Unreleased]
 
+### Added
+- Library: the GPS point plus road, kilometer marker, tambon, amphoe and province per event. "Fetch address" looks them up from the GPS point (needs internet, only when pressed); the kilometer marker is also picked out of the voice note; each value is labelled "from GPS", "from voice" or "edited"; all fields can be edited by hand. The share text includes them.
+- After merging clips the app says where the file is, shows it on the event card, and can save it to the gallery (Movies/SafetyRoadWatch, Android 10+).
+
+### Changed
+- Library buttons are equal in size and have icons.
+- The capture button is now a soft, 50% transparent green with a shield instead of solid red.
+
 ### Fixed
 - The camera screen now keeps the screen on and shows over the lock screen, and recording restarts cleanly after the screen was off or after the library.
+
+### เพิ่ม
+- คลัง: แสดงพิกัด GPS พร้อมถนน หลักกิโลเมตร ตำบล อำเภอ จังหวัด ของแต่ละเหตุการณ์ กด "ดึงที่อยู่" เพื่อหาจากพิกัด GPS (ต้องใช้เน็ต และดึงเมื่อกดเท่านั้น) หลักกิโลเมตรดึงจากเสียงที่พูดได้ด้วย บอกที่มาของแต่ละค่า (จาก GPS / จากเสียง / แก้เอง) และแก้เองได้ทุกช่อง ข้อความแชร์ใส่ที่อยู่ให้
+- หลังรวมคลิป แอปบอกว่าไฟล์อยู่ที่ไหน แสดงในการ์ดเหตุการณ์ และบันทึกลงแกลเลอรีได้ (Movies/SafetyRoadWatch, Android 10 ขึ้นไป)
+
+### เปลี่ยน
+- ปุ่มในคลังขนาดเท่ากันและมีไอคอน
+- ปุ่มบันทึกหน้ากล้องเป็นสีเขียวโปร่งแสง 50% มีรูปโล่ แทนสีแดงทึบ
 
 ### แก้ไข
 - หน้ากล้องเปิดจอค้างไว้และแสดงทับหน้าจอล็อกได้ และอัดต่อได้ถูกต้องหลังจอดับหรือกลับจากคลัง
