@@ -40,7 +40,7 @@ one press, a short spoken note, keep driving. Review and send it after parking.
 |---|---|---|
 | R1 | Dashcam screen: back camera preview, screen stays on, video recorded continuously in a rolling buffer, **video only** | Built |
 | R2 | Capture by tapping the big button, or a Bluetooth remote / volume / play-pause / enter key | Built |
-| R3 | One capture = about **30 s before** and **30 s after** the press, kept as 10 s clips | Built |
+| R3 | One capture = about **30 s before** and **30 s after** the press, kept as 20 s clips, so the "before" part is 30 to 50 s and the "after" part 30 to 50 s (whole clips) | Built |
 | R4 | After a capture press, record a voice note; stop on the next press, after 8 s of silence (speech resumes the clock), or after 45 s. A new press is allowed at any time, even while the previous event still collects its 30 s or is being transcribed | Built |
 | R5 | Keep the voice note as a separate audio file (`voice.wav`) the user can replay | Built |
 | R6 | Transcribe the voice note (Thai, `th-TH`), on-device when available | Built (Android 13+ only) |
@@ -80,6 +80,7 @@ one press, a short spoken note, keep driving. Review and send it after parking.
 | 2026-10-20 | Supersedes the row above: the address lookup is an opt-in **mode** (off by default). Turning it on, or pressing "fetch address" while off, shows a consent dialog; accepting lets the library fill missing addresses automatically. Declining or having no internet never blocks anything else (recording, voice, merge, share, typing the address) | Owner |
 | 2026-10-20 | Voice note ends 8 s after the last speech (cap 45 s, was a fixed 12 s that cut people off). While the mic is on the button turns yellow and pulses (no red). A new capture can start at any time; events overlap and the later one gets copies of the footage already collected | Owner |
 | 2026-10-20 | `dev` is the default and a protected branch; `main` is protected. Everything reaches `main` only by a promotion PR from `dev`. A `sync-main` workflow opens a PR `main` → `dev` after any push to `main`, so the two never drift (a README edit went straight to `main` once and had to be merged back by hand) | Owner |
+| 2026-10-20 | Fewer joins between clips first: record 20 s pieces instead of 10 s (option A). A gap-free recorder with our own `MediaCodec` ring (option B) only if the owner still sees jumps in the field | Owner |
 | 2026-10-20 | Video plays inside the app (no external player), each event has a still picture from the moment of the press that is also attached when sharing, and settings are whole-card switches (field test on the owner's phone: the checkbox was not visibly tappable) | Owner |
 | 2026-10-20 | Add a dark home screen as the launcher (start / library / settings). "Open camera on start" is off by default but recommended for use in the car. The address lookup choice moves from the library to settings | Owner |
 | 2026-10-20 | Capture button on the camera screen: 50% transparent green with a shield, calm and not alarming | Owner |

@@ -19,7 +19,7 @@ import java.io.File
 import androidx.camera.video.Recorder as CxRecorder
 
 /**
- * Rolling 10 s video-only segments. NEVER enables audio (the mic is only used by Voice after a button press).
+ * Rolling 20 s video-only segments (fewer joins than short ones; each join loses about 0.1 s). NEVER enables audio (the mic is only used by Voice after a button press).
  */
 class Rolling(private val activity: AppCompatActivity, private val store: EventStore) {
     private val main = Handler(Looper.getMainLooper())
@@ -84,15 +84,22 @@ class Rolling(private val activity: AppCompatActivity, private val store: EventS
         for (a in active) {
             a.dir.listFiles { f -> f.name.startsWith("clip_") && f.name.endsWith(".mp4") }?.forEach { f ->
                 val s = f.name.removePrefix("clip_").removeSuffix(".mp4").toLongOrNull()
-                if (s != null && s >= now - 35_000) f.copyTo(File(dir, f.name), true)
+                if (s != null && s >= now - PRE_WINDOW_MS) f.copyTo(File(dir, f.name), true)
             }
         }
         ring.listFiles()?.forEach { f ->
             val s = startOf(f)
-            if (s != null && s != curStart && s >= now - 35_000) moveTo(f, dir, s)
+            if (s != null && s != curStart && s >= now - PRE_WINDOW_MS) moveTo(f, dir, s)
         }
         active.add(Active(dir, now + 30_000))
         return dir
+    }
+
+    private companion object {
+        const val SEGMENT_MS = 20_000L
+
+        // A segment that started up to one segment length before the 30 s mark still holds part of the 30 s.
+        const val PRE_WINDOW_MS = 30_000L + SEGMENT_MS
     }
 
     private fun startOf(f: File) = f.name.removePrefix("seg_").removeSuffix(".mp4").toLongOrNull()
@@ -117,7 +124,7 @@ class Rolling(private val activity: AppCompatActivity, private val store: EventS
                 if (ev is VideoRecordEvent.Finalize) onFinalize(file, start, ev.error)
             }
         main.removeCallbacks(stopSegment)
-        main.postDelayed(stopSegment, 10_000)
+        main.postDelayed(stopSegment, SEGMENT_MS)
     }
 
     private fun onFinalize(file: File, start: Long, error: Int) {
