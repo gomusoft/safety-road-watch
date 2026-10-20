@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Safety Road Watch</string>
+    <string name="home_tagline">ถนนที่ปลอดภัย เริ่มจากคนธรรมดาที่ไม่นิ่งเฉย</string>
+    <string name="home_start">🛡️ เริ่มบันทึก</string>
+    <string name="home_settings">ตั้งค่า</string>
     <string name="btn_catch">🛡️ บันทึก</string>
     <string name="btn_recording">🎙️ กำลังบันทึกเสียง · แตะเพื่อจบ</string>
     <string name="btn_library">คลัง</string>

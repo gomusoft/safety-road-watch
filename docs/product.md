@@ -48,6 +48,7 @@ one press, a short spoken note, keep driving. Review and send it after parking.
 | R8 | Spoken confirmation (TTS) of what was saved | Built |
 | R9 | Library: list events, replay voice, play each clip, choose clips, **merge** chosen clips into one MP4, share clips + a ready-made Thai report text with a Google Maps link, delete | Built |
 | R10 | Record time and GPS location with each event | Built |
+| R13 | Home screen (dark): start recording, library with count, settings, permission readiness. Settings: address lookup (opt-in) and open camera on start (off by default) | Built, not field-tested |
 | R12 | Place per event: road, kilometer marker, tambon, amphoe, province. Fetched on demand from the GPS point (phone geocoder), km also from the voice note, all editable | Built, not field-tested |
 | R11 | CI builds an installable APK on every push; the phone downloads it from one link | Built |
 
@@ -78,5 +79,6 @@ one press, a short spoken note, keep driving. Review and send it after parking.
 | 2026-10-20 | Address (road, tambon, amphoe, province) is fetched only when the user presses a button, never automatically: the phone geocoder sends the coordinate to the map service over the internet, which breaks "nothing leaves the phone" if done silently. Kilometer marker comes from the voice note or typing: the phone geocoder does not return it, and speaking while driving is not required (the owner does not always know where they are), so GPS fills the rest. The library shows the coordinate and labels each value as from GPS, voice or edited. Merged video stays in the app until the user saves it to the gallery | Lead agent from owner request, owner to confirm |
 | 2026-10-20 | Supersedes the row above: the address lookup is an opt-in **mode** (off by default). Turning it on, or pressing "fetch address" while off, shows a consent dialog; accepting lets the library fill missing addresses automatically. Declining or having no internet never blocks anything else (recording, voice, merge, share, typing the address) | Owner |
 | 2026-10-20 | Voice note ends 8 s after the last speech (cap 45 s, was a fixed 12 s that cut people off). While the mic is on the button turns yellow and pulses (no red). A new capture can start at any time; events overlap and the later one gets copies of the footage already collected | Owner |
+| 2026-10-20 | Add a dark home screen as the launcher (start / library / settings). "Open camera on start" is off by default but recommended for use in the car. The address lookup choice moves from the library to settings | Owner |
 | 2026-10-20 | Capture button on the camera screen: 50% transparent green with a shield, calm and not alarming | Owner |
 | 2026-10-20 | Agent team: an Opus-class lead designs and reviews; cheaper models (Sonnet) write the code, to save tokens | Owner |
