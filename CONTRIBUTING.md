@@ -37,5 +37,21 @@ Interim process until the dev-pose release workflow is added (it will promote `d
 3. CI builds the APK and publishes the GitHub release `vX.Y.Z` with that changelog section as its notes.
 4. Pushes to `dev` refresh `dev-latest`; pushes to `main` refresh `latest`.
 
+## Reporting channels and the guide
+The "send report" guide (Library → "ส่งรายงานให้หน่วยงาน", and Settings → "คู่มือการส่งรายงาน") reads
+`app/src/main/assets/recipients.json`. Anyone can add or fix a channel with a normal PR:
+
+- One entry per way of sending: `how` is `web` (an https URL the user sees before it opens), `mail` (opens the mail app with
+  the report and files attached) or `phone` (opens the dialer). Only list **official** channels, and never a link that
+  arrived by SMS or LINE: fake DLT and police messages circulate. Write `verified` honestly (what you saw, when) and
+  set `checked` to today's date. Unverified details stay marked as unverified.
+- The research notes live in `docs/guide/channels.md` and `docs/reporting-channels.md`; update them with the same PR.
+- Screenshots (optional but wanted): open the real page on a phone-sized screen (about 390 x 844), take one picture per
+  step, put it in `app/src/main/assets/guide/<id>-<step>.png`, and list the file names in the entry's `images` array
+  (same order as `steps`, `""` for a step without a picture). **Never include personal data** (names, ID or plate numbers,
+  phone numbers, cookies, logged-in pages) and never submit a real or fake report to take a picture.
+- The app has no internet permission and never sends data itself. Keep it that way: the guide only opens the browser, the mail app or the dialer.
+- Users can press "แจ้งว่าไม่ตรง" in the guide: it opens a prefilled GitHub issue. Fix the entry and close the issue.
+
 ## License
 By contributing you agree your contribution is licensed under [CC BY-NC-SA 4.0](LICENSE).

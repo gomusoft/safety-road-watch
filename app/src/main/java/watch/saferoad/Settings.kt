@@ -20,6 +20,17 @@ object Settings {
     fun stabilize(c: Context) = prefs(c).getBoolean("stabilize", true)
     fun setStabilize(c: Context, on: Boolean) = prefs(c).edit().putBoolean("stabilize", on).apply()
 
+    /** Who is reporting. Stays on the phone; goes only into the text of a report the user sends. */
+    fun profileName(c: Context) = prefs(c).getString("profile_name", "") ?: ""
+    fun profilePhone(c: Context) = prefs(c).getString("profile_phone", "") ?: ""
+    fun profileEmail(c: Context) = prefs(c).getString("profile_email", "") ?: ""
+    fun setProfile(c: Context, name: String, phone: String, email: String) =
+        prefs(c).edit().putString("profile_name", name).putString("profile_phone", phone).putString("profile_email", email).apply()
+
+    /** The user has read and accepted the rules for sending a report. */
+    fun reportAccepted(c: Context) = prefs(c).getBoolean("report_accepted", false)
+    fun setReportAccepted(c: Context, on: Boolean) = prefs(c).edit().putBoolean("report_accepted", on).apply()
+
     /** The user must accept before any coordinate is sent to the phone's map service. */
     fun askLookupConsent(a: AppCompatActivity, onYes: () -> Unit) {
         AlertDialog.Builder(a)

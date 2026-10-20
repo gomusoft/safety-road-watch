@@ -15,6 +15,7 @@ Package `watch.saferoad`, minSdk 26, target/compile SDK 35, JDK 17.
 | `Voice.kt` | Voice note: records through `Mic`, writes `voice.wav`; then transcribes the PCM with `SpeechRecognizer` + `RecognizerIntent.EXTRA_AUDIO_SOURCE` (API 33+), on-device recognizer if available |
 | `Parse.kt` | Pure Kotlin (no Android imports, unit tested in `app/src/test`). Normalises spoken letter names and Thai digits, extracts plate, province (77 + aliases) and violation keywords |
 | `EventStore.kt` | Creates event folders, reads/writes `event.json`, tracks location (GPS + network listeners while the camera screen is visible, last-known fallback) |
+| `Report.kt`, `Recipients.kt`, `GuideActivity.kt` | Sending a report: report text (with the user's profile), attachments, mail intent, gallery copy, URL confirm dialog and the first-use rules; the agencies come from `assets/recipients.json`; the guide screen shows steps for one agency (see CONTRIBUTING.md) |
 | `LibraryActivity.kt` | Library UI built in code: cards per event, voice playback (`MediaPlayer`), clip playback via `FileProvider` + `ACTION_VIEW`, merge, share (`ACTION_SEND_MULTIPLE`), delete |
 | `PlayerActivity.kt` | In-app player: `VideoView` + `MediaController` for one clip or `merged.mp4` (path in the intent, no external app) |
 | `Thumb.kt` | The still picture of an event: the frame at the press moment (`MediaMetadataRetriever`), saved once as `thumb.jpg`, cached in memory. Library draws it on a background thread; share attaches it |

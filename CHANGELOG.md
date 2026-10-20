@@ -21,6 +21,8 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 
 - Merging clips asks whether to put your voice note into the merged video (placed where you pressed the button) or leave it silent. While watching the merged video, "อัดเสียงบรรยาย" records a new spoken note over it (say what you see as it plays) and can put it into the video; the microphone is on only between your two presses.
 
+- Send a report: "ส่งรายงานให้หน่วยงาน" on each event opens a guide for the chosen agency (DLT reward system and complaint web, DLT e-mail, police 1197, PCD 1650) with the steps, the address to open (always shown and confirmed before the browser opens), a button to copy the report text, one to save the video and pictures to the gallery so a web form can attach them, and one to open the mail app with everything attached. The first time you accept the rules. Nothing is sent by the app itself. The guide is also in Settings, together with your sender profile (name, phone, e-mail, kept on the phone and added to the report text only when you send). If a page or step no longer matches the guide, "แจ้งว่าไม่ตรง" opens a prefilled GitHub issue (shown to you first). Agencies are listed in `recipients.json`, so contributors can add or fix them with a commit.
+
 ### Changed
 - The in-app player has its own play/pause button and a seek bar.
 - Clips you untick in the library stay unticked after you watch another clip and come back.
@@ -51,6 +53,8 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 - ตอนดูวิดีโอ ซูมได้ด้วยสองนิ้ว (หรือแตะสองครั้ง) และลากดูส่วนอื่น เพื่ออ่านทะเบียนให้ชัด ปุ่ม "จับภาพ" เก็บภาพที่เห็นบนจอเป็นรูปนิ่งของเหตุการณ์ จับได้หลายภาพ รูปจะอยู่ใต้เหตุการณ์ กดดูเต็มจอและซูมได้ (ลบได้) และถูกส่งไปพร้อมตอนแชร์
 
 - ตอนรวมคลิป แอปถามว่าจะใส่เสียงที่บันทึกไว้ลงในวิดีโอ (ตรงจุดที่กดปุ่ม) หรือไม่ใส่เสียง และตอนดูวิดีโอที่รวมแล้ว ปุ่ม "อัดเสียงบรรยาย" อัดเสียงพูดใหม่ทับไปกับภาพ (พูดสิ่งที่เห็นขณะเล่น) และใส่ลงในวิดีโอได้ ไมค์เปิดเฉพาะระหว่างที่กดปุ่มเริ่มจนกดหยุด
+
+- ส่งรายงาน: ปุ่ม "ส่งรายงานให้หน่วยงาน" ในแต่ละเหตุการณ์ เปิดคู่มือของหน่วยงานที่เลือก (ระบบขอรับเงินสินบนและเว็บร้องเรียนของกรมการขนส่งทางบก อีเมลกรมฯ ตำรวจ 1197 กรมควบคุมมลพิษ 1650) มีขั้นตอน ที่อยู่เว็บที่ต้องเปิด (แสดงและให้ยืนยันก่อนเปิดเบราว์เซอร์ทุกครั้ง) ปุ่มคัดลอกข้อความรายงาน ปุ่มบันทึกวิดีโอและรูปลงแกลเลอรีเพื่อแนบในเว็บ และปุ่มเปิดแอปอีเมลพร้อมแนบไฟล์ ครั้งแรกต้องอ่านและยอมรับกติกา แอปไม่ส่งข้อมูลเอง คู่มืออยู่ในตั้งค่าด้วย พร้อมโปรไฟล์ผู้ส่ง (ชื่อ เบอร์ อีเมล เก็บในเครื่อง ใส่ในข้อความรายงานเมื่อคุณกดส่งเท่านั้น) ถ้าหน้าเว็บหรือขั้นตอนไม่ตรงกับคู่มือ ปุ่ม "แจ้งว่าไม่ตรง" เปิดหน้า GitHub ที่กรอกไว้ให้ (แสดงให้ดูก่อน) รายชื่อหน่วยงานอยู่ในไฟล์ `recipients.json` ผู้ร่วมพัฒนาเพิ่มหรือแก้ได้ด้วยคอมมิต
 
 ### เปลี่ยน
 - เครื่องเล่นในแอปมีปุ่มเล่น/หยุดและแถบเลื่อนของตัวเอง

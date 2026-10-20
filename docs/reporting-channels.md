@@ -3,6 +3,17 @@
 Research notes from 2026-10-20. Most sources are news and blog articles, not official notices.
 **Verify with 1197 / 1584 before relying on any detail**, and update this file with what you learn.
 
+## Checked on 2026-10-20
+
+Details, URLs and confidence per channel are in [guide/channels.md](guide/channels.md). Key points:
+
+- DLT now appears to route reward claims (50 %) through one website, **recompense.dlt.go.th** (login with ID number
+  or ThaID, register first); the older LINE `@1584DLT`, e-mail and Facebook channels are from 2021-2022 news.
+- No official police LINE account or web form for traffic clips was confirmed; the police clip programme
+  "อาสาตาจราจร" was active in 2026 (prizes announced 2026-09-09). `@dltthailand` was not found.
+- All Thai government hosts were blocked from the research container, so no form was opened and there are no
+  screenshots. Confirm with 1584 / 1197 (questions listed at the end of guide/channels.md).
+
 ## Where to report
 
 | Violation | Agency | Channel |
