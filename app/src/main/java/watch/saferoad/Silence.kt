@@ -31,3 +31,30 @@ fun rms(buf: ByteArray, n: Int): Double {
     }
     return Math.sqrt(sum / samples)
 }
+
+/**
+ * First-order high-pass filter for 16-bit little-endian mono PCM: cuts engine rumble and road vibration below
+ * [cutoffHz] (speech sits above about 200 Hz). Keeps its state between buffers, so feed it in order.
+ */
+class HighPass(sampleRate: Int, cutoffHz: Double = 150.0) {
+    private val a = run {
+        val rc = 1.0 / (2 * Math.PI * cutoffHz)
+        val dt = 1.0 / sampleRate
+        rc / (rc + dt)
+    }
+    private var prevIn = 0.0
+    private var prevOut = 0.0
+
+    /** Filters the first [n] bytes of [buf] in place. */
+    fun apply(buf: ByteArray, n: Int) {
+        for (i in 0 until n / 2) {
+            val x = ((buf[2 * i].toInt() and 0xFF) or (buf[2 * i + 1].toInt() shl 8)).toShort().toDouble()
+            val y = a * (prevOut + x - prevIn)
+            prevIn = x
+            prevOut = y
+            val v = Math.round(y).toInt().coerceIn(-32768, 32767)
+            buf[2 * i] = v.toByte()
+            buf[2 * i + 1] = (v shr 8).toByte()
+        }
+    }
+}

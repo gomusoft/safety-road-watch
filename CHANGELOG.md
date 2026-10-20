@@ -19,6 +19,7 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 
 ### Changed
 - Clips you untick in the library stay unticked after you watch another clip and come back.
+- The voice note filters out engine rumble and road vibration, and uses the phone's own noise suppression when it has it, so your voice is easier to hear and to transcribe in a noisy car.
 - Video is recorded in 20-second pieces instead of 10, so there are about half as many tiny jumps between clips. The "before" and "after" parts now run 30 to 50 seconds (whole clips).
 - Settings: each option is a card you can tap anywhere, with a clear on/off switch.
 - The library works in both portrait and landscape and turns with the phone, even if auto-rotate is locked, so you no longer have to rotate back and forth after capturing.
@@ -44,6 +45,7 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 
 ### เปลี่ยน
 - คลิปที่เอาติ๊กออกในคลังยังคงไม่ติ๊กหลังไปดูคลิปอื่นแล้วกลับมา
+- เสียงบันทึกตัดเสียงเครื่องยนต์และเสียงสั่นของถนนออก และใช้ตัวลดเสียงรบกวนของเครื่องถ้ามี ทำให้ได้ยินเสียงพูดชัดขึ้นและถอดเสียงได้ดีขึ้นในรถที่เสียงดัง
 - อัดวิดีโอเป็นท่อนละ 20 วินาทีแทน 10 วินาที รอยต่อสะดุดเล็กๆ ระหว่างคลิปจึงลดลงประมาณครึ่งหนึ่ง ช่วงก่อนกดและหลังกดจะยาว 30 ถึง 50 วินาที (ครบทั้งคลิป)
 - ตั้งค่า: แต่ละตัวเลือกเป็นแถบกดได้ทั้งแถบ มีสวิตช์เปิด/ปิดที่ชัดเจน
 - คลังใช้ได้ทั้งแนวตั้งและแนวนอน หมุนตามเครื่อง แม้ปิดการหมุนอัตโนมัติไว้ ไม่ต้องหมุนเครื่องกลับไปมาหลังบันทึก

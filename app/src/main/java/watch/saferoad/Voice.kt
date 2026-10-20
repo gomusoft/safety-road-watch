@@ -6,6 +6,8 @@ import android.content.Intent
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.media.audiofx.AutomaticGainControl
+import android.media.audiofx.NoiseSuppressor
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -45,16 +47,23 @@ class Voice(context: Context) {
         Thread {
             val pcm = File(dir, "voice.pcm")
             var ar: AudioRecord? = null
+            var ns: NoiseSuppressor? = null
+            var agc: AutomaticGainControl? = null
             try {
                 val size = maxOf(
                     AudioRecord.getMinBufferSize(RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT),
                     4096,
                 )
+                // VOICE_RECOGNITION tunes the mic for speech; the phone's own noise suppression and gain control
+                // are added when it has them. Engine rumble is cut below by the high-pass filter.
                 ar = AudioRecord(
-                    MediaRecorder.AudioSource.MIC, RATE, AudioFormat.CHANNEL_IN_MONO,
+                    MediaRecorder.AudioSource.VOICE_RECOGNITION, RATE, AudioFormat.CHANNEL_IN_MONO,
                     AudioFormat.ENCODING_PCM_16BIT, size * 2,
                 )
                 check(ar.state == AudioRecord.STATE_INITIALIZED)
+                if (NoiseSuppressor.isAvailable()) ns = NoiseSuppressor.create(ar.audioSessionId)?.also { it.enabled = true }
+                if (AutomaticGainControl.isAvailable()) agc = AutomaticGainControl.create(ar.audioSessionId)?.also { it.enabled = true }
+                val highPass = HighPass(RATE)
                 val buf = ByteArray(size)
                 val end = SystemClock.elapsedRealtime() + MAX_MS
                 val silence = SilenceDetector()
@@ -64,6 +73,7 @@ class Voice(context: Context) {
                         val n = ar.read(buf, 0, buf.size)
                         if (n < 0) break
                         if (n > 0) {
+                            highPass.apply(buf, n)
                             out.write(buf, 0, n)
                             if (silence.update(rms(buf, n), SystemClock.elapsedRealtime())) break
                         }
@@ -76,6 +86,8 @@ class Voice(context: Context) {
                     ar?.stop()
                 } catch (e: Exception) {
                 }
+                ns?.release()
+                agc?.release()
                 ar?.release()
                 isRecording = false
             }
