@@ -10,6 +10,25 @@ import java.io.FileOutputStream
 /** The still picture of an event: the video frame at the moment of the press, saved once as thumb.jpg. */
 object Thumb {
     private val cache = LruCache<String, Bitmap>(12)
+    private val small = LruCache<String, Bitmap>(80)
+
+    /** First frame of any clip or merged video, small, kept in memory only. Blocking: call off the main thread. */
+    fun first(f: File): Bitmap? {
+        val key = "${f.path}:${f.lastModified()}"
+        small.get(key)?.let { return it }
+        val r = MediaMetadataRetriever()
+        return try {
+            r.setDataSource(f.path)
+            val raw = r.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC) ?: return null
+            val bmp = if (raw.width > 320) Bitmap.createScaledBitmap(raw, 320, raw.height * 320 / raw.width, true) else raw
+            small.put(key, bmp)
+            bmp
+        } catch (ex: Exception) {
+            null
+        } finally {
+            r.release()
+        }
+    }
 
     private fun startOf(f: File) = f.name.removePrefix("clip_").removeSuffix(".mp4").toLongOrNull()
 

@@ -25,11 +25,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import java.io.File
+import java.util.concurrent.Executors
 
 class LibraryActivity : AppCompatActivity() {
     private lateinit var store: EventStore
     private lateinit var list: LinearLayout
     private var player: MediaPlayer? = null
+    private val pool = Executors.newFixedThreadPool(2) // video frames are decoded one or two at a time
 
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
 
@@ -126,10 +128,10 @@ class LibraryActivity : AppCompatActivity() {
                 setOnClickListener { playClip(File(e.dir, "merged.mp4").takeIf { it.exists() } ?: clips.first()) }
             }
             card.addView(pic, LinearLayout.LayoutParams(MATCH_PARENT, dp(180)).apply { topMargin = dp(4); bottomMargin = dp(8) })
-            Thread {
+            pool.execute {
                 val bmp = Thumb.load(e)
                 if (bmp != null) runOnUiThread { if (!isFinishing) pic.setImageBitmap(bmp) }
-            }.start()
+            }
         }
         val who = listOfNotNull(e.plate, e.province).joinToString(" ")
         card.addView(text(who.ifEmpty { "ไม่ได้ยินทะเบียน" }, 20f, true))
@@ -173,6 +175,7 @@ class LibraryActivity : AppCompatActivity() {
             }
             checks.add(cb to f)
             val line = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+            line.addView(stillOf(f), LinearLayout.LayoutParams(dp(96), dp(54)).apply { marginEnd = dp(8) })
             line.addView(cb, LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f))
             line.addView(button("ดู", R.drawable.ic_play) { playClip(f) }, LinearLayout.LayoutParams(dp(110), WRAP_CONTENT))
             card.addView(line)
@@ -188,6 +191,7 @@ class LibraryActivity : AppCompatActivity() {
         val merged = File(e.dir, "merged.mp4")
         if (merged.exists()) {
             card.addView(text("คลิปที่รวมแล้ว: ${"%.1f".format(merged.length() / 1048576.0)} MB (อยู่ในแอป)", 13f))
+            card.addView(stillOf(merged), LinearLayout.LayoutParams(dp(160), dp(90)).apply { bottomMargin = dp(4) })
             val open = button("เปิดดู", R.drawable.ic_play) { playClip(merged) }
             card.addView(
                 if (Build.VERSION.SDK_INT >= 29) row(open, button("บันทึกลงแกลเลอรี", R.drawable.ic_save) { saveToGallery(e, merged) })
@@ -195,6 +199,22 @@ class LibraryActivity : AppCompatActivity() {
             )
         }
         return card
+    }
+
+    /** Small picture of the first frame of a video file; tapping it plays the video. */
+    private fun stillOf(f: File) = ImageView(this).apply {
+        scaleType = ImageView.ScaleType.CENTER_CROP
+        setBackgroundColor(0xFFCCCCCC.toInt())
+        setOnClickListener { playClip(f) }
+        pool.execute {
+            val bmp = Thumb.first(f)
+            if (bmp != null) runOnUiThread { if (!isFinishing) setImageBitmap(bmp) }
+        }
+    }
+
+    override fun onDestroy() {
+        pool.shutdownNow()
+        super.onDestroy()
     }
 
     private fun uri(f: File): Uri = FileProvider.getUriForFile(this, "$packageName.files", f)
