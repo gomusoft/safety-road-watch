@@ -142,7 +142,7 @@ class Voice(context: Context) {
         }
     }
 
-    private companion object {
+    companion object {
         const val RATE = 16000
         const val MAX_MS = 45_000L
     }
