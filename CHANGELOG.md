@@ -7,6 +7,8 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 ## [Unreleased]
 
 ### Added
+- Clips and the merged video now play inside the app (no other video app needed).
+- Every clip and the merged video show a small picture of their first frame, tap it to play. Each event also shows a still picture: the video frame at the moment you pressed. It is saved with the event and sent along when you share.
 - Home screen: a big start button, the library (with the number of events), settings, and a quick check that camera, microphone and GPS are allowed. Settings has the address lookup choice (moved from the library) and "open camera on start", which skips the home screen (off by default).
 - Library: the GPS point plus road, kilometer marker, tambon, amphoe and province per event. "Fetch address" looks them up from the GPS point (needs internet and your consent); the kilometer marker is also picked out of the voice note; each value is labelled "from GPS", "from voice" or "edited"; all fields can be edited by hand. The share text includes them.
 - Address lookup is an opt-in mode (off by default, asks for your consent first, because it sends the coordinate to the phone's map service). When on, the library fills in missing addresses by itself; offline it quietly waits and everything else keeps working.
@@ -14,6 +16,7 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 
 ### Changed
 - Video is recorded in 20-second pieces instead of 10, so there are about half as many tiny jumps between clips. The "before" and "after" parts now run 30 to 50 seconds (whole clips).
+- Settings: each option is a card you can tap anywhere, with a clear on/off switch.
 - The library works in both portrait and landscape and turns with the phone, even if auto-rotate is locked, so you no longer have to rotate back and forth after capturing.
 - The voice note now ends 8 seconds after you stop talking (up to 45 s) instead of a fixed 12 s; speak again before that and it keeps recording, or press the button to end it.
 - While the voice note is recording the button turns yellow and pulses, with a big banner and a light vibration.
@@ -25,6 +28,8 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 - The camera screen now keeps the screen on and shows over the lock screen, and recording restarts cleanly after the screen was off or after the library.
 
 ### เพิ่ม
+- ดูคลิปและวิดีโอที่รวมแล้วในแอปได้เลย ไม่ต้องใช้แอปวิดีโออื่น
+- ทุกคลิปและวิดีโอที่รวมแล้วมีภาพแรกของคลิปให้ดู กดที่ภาพเพื่อเล่น และการ์ดแต่ละเหตุการณ์มีภาพนิ่ง คือภาพวิดีโอ ณ วินาทีที่กดบันทึก เก็บไว้กับเหตุการณ์ และแนบไปตอนแชร์
 - หน้าแรก: ปุ่มเริ่มบันทึกใหญ่ คลัง (บอกจำนวนเหตุการณ์) ตั้งค่า และแถบเช็กว่าอนุญาตกล้อง ไมค์ GPS แล้วหรือยัง ในตั้งค่ามีตัวเลือกดึงที่อยู่ (ย้ายมาจากหัวคลัง) และ "เปิดกล้องทันทีเมื่อเปิดแอป" ที่ข้ามหน้าแรก (ปิดไว้ก่อน)
 - คลัง: แสดงพิกัด GPS พร้อมถนน หลักกิโลเมตร ตำบล อำเภอ จังหวัด ของแต่ละเหตุการณ์ กด "ดึงที่อยู่" เพื่อหาจากพิกัด GPS (ต้องใช้เน็ตและกดยอมรับก่อน) หลักกิโลเมตรดึงจากเสียงที่พูดได้ด้วย บอกที่มาของแต่ละค่า (จาก GPS / จากเสียง / แก้เอง) และแก้เองได้ทุกช่อง ข้อความแชร์ใส่ที่อยู่ให้
 - การดึงที่อยู่เป็นโหมดที่เลือกเปิดเอง (ปิดไว้ก่อน และขอให้กดยอมรับก่อน เพราะส่งพิกัดให้บริการแผนที่ของเครื่อง) เมื่อเปิด คลังจะเติมที่อยู่ให้เอง ถ้าไม่มีเน็ตก็ข้ามไปเงียบๆ และใช้อย่างอื่นได้ตามปกติ
@@ -32,6 +37,7 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 
 ### เปลี่ยน
 - อัดวิดีโอเป็นท่อนละ 20 วินาทีแทน 10 วินาที รอยต่อสะดุดเล็กๆ ระหว่างคลิปจึงลดลงประมาณครึ่งหนึ่ง ช่วงก่อนกดและหลังกดจะยาว 30 ถึง 50 วินาที (ครบทั้งคลิป)
+- ตั้งค่า: แต่ละตัวเลือกเป็นแถบกดได้ทั้งแถบ มีสวิตช์เปิด/ปิดที่ชัดเจน
 - คลังใช้ได้ทั้งแนวตั้งและแนวนอน หมุนตามเครื่อง แม้ปิดการหมุนอัตโนมัติไว้ ไม่ต้องหมุนเครื่องกลับไปมาหลังบันทึก
 - บันทึกเสียงจบเองเมื่อเงียบไป 8 วินาที (สูงสุด 45 วินาที) แทน 12 วินาทีตายตัว ถ้าพูดต่อก่อนครบ 8 วินาทีก็อัดต่อ หรือกดปุ่มเพื่อจบเอง
 - ระหว่างอัดเสียง ปุ่มเปลี่ยนเป็นสีเหลืองกะพริบ มีแถบข้อความตัวใหญ่ และเครื่องสั่นเบาๆ
