@@ -4,10 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.media.AudioFormat
-import android.media.AudioRecord
-import android.media.MediaRecorder
-import android.media.audiofx.AutomaticGainControl
-import android.media.audiofx.NoiseSuppressor
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -19,9 +15,6 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.annotation.RequiresApi
 import java.io.File
-import java.io.FileOutputStream
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 
 /**
  * Records the voice note (mic only while recording), writes voice.wav, then transcribes it.
@@ -46,49 +39,12 @@ class Voice(context: Context) {
         isRecording = true
         Thread {
             val pcm = File(dir, "voice.pcm")
-            var ar: AudioRecord? = null
-            var ns: NoiseSuppressor? = null
-            var agc: AutomaticGainControl? = null
             try {
-                val size = maxOf(
-                    AudioRecord.getMinBufferSize(RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT),
-                    4096,
-                )
-                // VOICE_RECOGNITION tunes the mic for speech; the phone's own noise suppression and gain control
-                // are added when it has them. Engine rumble is cut below by the high-pass filter.
-                ar = AudioRecord(
-                    MediaRecorder.AudioSource.VOICE_RECOGNITION, RATE, AudioFormat.CHANNEL_IN_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT, size * 2,
-                )
-                check(ar.state == AudioRecord.STATE_INITIALIZED)
-                if (NoiseSuppressor.isAvailable()) ns = NoiseSuppressor.create(ar.audioSessionId)?.also { it.enabled = true }
-                if (AutomaticGainControl.isAvailable()) agc = AutomaticGainControl.create(ar.audioSessionId)?.also { it.enabled = true }
-                val highPass = HighPass(RATE)
-                val buf = ByteArray(size)
-                val end = SystemClock.elapsedRealtime() + MAX_MS
                 val silence = SilenceDetector()
-                ar.startRecording()
-                FileOutputStream(pcm).use { out ->
-                    while (isRecording && SystemClock.elapsedRealtime() < end) {
-                        val n = ar.read(buf, 0, buf.size)
-                        if (n < 0) break
-                        if (n > 0) {
-                            highPass.apply(buf, n)
-                            out.write(buf, 0, n)
-                            if (silence.update(rms(buf, n), SystemClock.elapsedRealtime())) break
-                        }
-                    }
-                }
+                Mic.record(pcm, MAX_MS, { isRecording }) { buf, n -> silence.update(rms(buf, n), SystemClock.elapsedRealtime()) }
             } catch (e: Exception) {
                 // handled below: empty pcm
             } finally {
-                try {
-                    ar?.stop()
-                } catch (e: Exception) {
-                }
-                ns?.release()
-                agc?.release()
-                ar?.release()
                 isRecording = false
             }
             if (pcm.length() == 0L) {
@@ -97,7 +53,7 @@ class Voice(context: Context) {
                 return@Thread
             }
             try {
-                writeWav(pcm, File(dir, "voice.wav"))
+                pcmToWav(pcm, File(dir, "voice.wav"))
             } catch (e: Exception) {
             }
             main.post {
@@ -120,19 +76,6 @@ class Voice(context: Context) {
         val job = jobs.removeFirstOrNull()
         transcribing = job != null
         job?.invoke()
-    }
-
-    private fun writeWav(pcm: File, wav: File) {
-        val len = pcm.length().toInt()
-        val h = ByteBuffer.allocate(44).order(ByteOrder.LITTLE_ENDIAN)
-        h.put("RIFF".toByteArray()).putInt(36 + len).put("WAVE".toByteArray())
-        h.put("fmt ".toByteArray()).putInt(16).putShort(1).putShort(1)
-        h.putInt(RATE).putInt(RATE * 2).putShort(2).putShort(16)
-        h.put("data".toByteArray()).putInt(len)
-        FileOutputStream(wav).use { out ->
-            out.write(h.array())
-            pcm.inputStream().use { it.copyTo(out) }
-        }
     }
 
     private fun transcribe(pcm: File, onDone: (String, String) -> Unit) {

@@ -19,6 +19,8 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 
 - While watching a video you can zoom in with two fingers (or double tap) and drag, to read a plate. "จับภาพ" saves the frame on screen as a still picture of the event; you can take several. They appear under the event, open full screen with zoom (and can be deleted), and are sent along when you share.
 
+- Merging clips asks whether to put your voice note into the merged video (placed where you pressed the button) or leave it silent. While watching the merged video, "อัดเสียงบรรยาย" records a new spoken note over it (say what you see as it plays) and can put it into the video; the microphone is on only between your two presses.
+
 ### Changed
 - The in-app player has its own play/pause button and a seek bar.
 - Clips you untick in the library stay unticked after you watch another clip and come back.
@@ -47,6 +49,8 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 - ตั้งค่ากันภาพสั่นของวิดีโอ เปิดไว้ให้เป็นค่าเริ่มต้น ถ้ากล้องของเครื่องทำไม่ได้จะเป็นสีจางพร้อมบอกเหตุผล
 
 - ตอนดูวิดีโอ ซูมได้ด้วยสองนิ้ว (หรือแตะสองครั้ง) และลากดูส่วนอื่น เพื่ออ่านทะเบียนให้ชัด ปุ่ม "จับภาพ" เก็บภาพที่เห็นบนจอเป็นรูปนิ่งของเหตุการณ์ จับได้หลายภาพ รูปจะอยู่ใต้เหตุการณ์ กดดูเต็มจอและซูมได้ (ลบได้) และถูกส่งไปพร้อมตอนแชร์
+
+- ตอนรวมคลิป แอปถามว่าจะใส่เสียงที่บันทึกไว้ลงในวิดีโอ (ตรงจุดที่กดปุ่ม) หรือไม่ใส่เสียง และตอนดูวิดีโอที่รวมแล้ว ปุ่ม "อัดเสียงบรรยาย" อัดเสียงพูดใหม่ทับไปกับภาพ (พูดสิ่งที่เห็นขณะเล่น) และใส่ลงในวิดีโอได้ ไมค์เปิดเฉพาะระหว่างที่กดปุ่มเริ่มจนกดหยุด
 
 ### เปลี่ยน
 - เครื่องเล่นในแอปมีปุ่มเล่น/หยุดและแถบเลื่อนของตัวเอง

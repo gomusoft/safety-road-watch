@@ -280,10 +280,33 @@ class LibraryActivity : AppCompatActivity() {
             Toast.makeText(this, "ยังไม่ได้เลือกคลิป", Toast.LENGTH_SHORT).show()
             return
         }
+        val wav = File(e.dir, "voice.wav").takeIf { it.exists() }
+        if (wav == null) {
+            doMerge(e, files, null)
+            return
+        }
+        // The voice note starts when the button was pressed, which is this far into the merged video.
+        val first = files.mapNotNull { it.name.removePrefix("clip_").removeSuffix(".mp4").toLongOrNull() }.minOrNull() ?: e.time
+        val offset = maxOf(0L, e.time - first)
+        var withVoice = true
+        AlertDialog.Builder(this)
+            .setTitle("เสียงในวิดีโอที่รวม")
+            .setSingleChoiceItems(
+                arrayOf("ใส่เสียงที่บันทึกไว้ (ตอนกดบันทึก)", "ไม่ใส่เสียง"),
+                0,
+            ) { _, which -> withVoice = which == 0 }
+            .setMessage("อยากอัดเสียงบรรยายใหม่ให้ตรงกับภาพ: รวมก่อน แล้วกดเปิดดู และกด \"อัดเสียงบรรยาย\" ระหว่างดู")
+            .setPositiveButton("รวมคลิป") { _, _ -> doMerge(e, files, if (withVoice) Narration(wav, offset) else null) }
+            .setNegativeButton("ยกเลิก", null)
+            .show()
+    }
+
+    private fun doMerge(e: EventInfo, files: List<File>, voice: Narration?) {
         Toast.makeText(this, "กำลังรวมคลิป…", Toast.LENGTH_SHORT).show()
         Thread {
+            var voiceOk = true
             val ok = try {
-                Merge.concat(files, File(e.dir, "merged.mp4"))
+                voiceOk = Merge.concat(files, File(e.dir, "merged.mp4"), voice)
                 true
             } catch (ex: Exception) {
                 false
@@ -294,6 +317,7 @@ class LibraryActivity : AppCompatActivity() {
                     Toast.makeText(this, "รวมคลิปไม่สำเร็จ", Toast.LENGTH_LONG).show()
                     return@runOnUiThread
                 }
+                if (!voiceOk) Toast.makeText(this, "ใส่เสียงไม่สำเร็จ รวมเฉพาะภาพ", Toast.LENGTH_LONG).show()
                 render()
                 mergedDialog(e)
             }
