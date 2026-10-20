@@ -7,7 +7,8 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 ## [Unreleased]
 
 ### Added
-- Library: the GPS point plus road, kilometer marker, tambon, amphoe and province per event. "Fetch address" looks them up from the GPS point (needs internet, only when pressed); the kilometer marker is also picked out of the voice note; each value is labelled "from GPS", "from voice" or "edited"; all fields can be edited by hand. The share text includes them.
+- Library: the GPS point plus road, kilometer marker, tambon, amphoe and province per event. "Fetch address" looks them up from the GPS point (needs internet and your consent); the kilometer marker is also picked out of the voice note; each value is labelled "from GPS", "from voice" or "edited"; all fields can be edited by hand. The share text includes them.
+- Address lookup is an opt-in mode (off by default, asks for your consent first, because it sends the coordinate to the phone's map service). When on, the library fills in missing addresses by itself; offline it quietly waits and everything else keeps working.
 - After merging clips the app says where the file is, shows it on the event card, and can save it to the gallery (Movies/SafetyRoadWatch, Android 10+).
 
 ### Changed
@@ -18,7 +19,8 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 - The camera screen now keeps the screen on and shows over the lock screen, and recording restarts cleanly after the screen was off or after the library.
 
 ### เพิ่ม
-- คลัง: แสดงพิกัด GPS พร้อมถนน หลักกิโลเมตร ตำบล อำเภอ จังหวัด ของแต่ละเหตุการณ์ กด "ดึงที่อยู่" เพื่อหาจากพิกัด GPS (ต้องใช้เน็ต และดึงเมื่อกดเท่านั้น) หลักกิโลเมตรดึงจากเสียงที่พูดได้ด้วย บอกที่มาของแต่ละค่า (จาก GPS / จากเสียง / แก้เอง) และแก้เองได้ทุกช่อง ข้อความแชร์ใส่ที่อยู่ให้
+- คลัง: แสดงพิกัด GPS พร้อมถนน หลักกิโลเมตร ตำบล อำเภอ จังหวัด ของแต่ละเหตุการณ์ กด "ดึงที่อยู่" เพื่อหาจากพิกัด GPS (ต้องใช้เน็ตและกดยอมรับก่อน) หลักกิโลเมตรดึงจากเสียงที่พูดได้ด้วย บอกที่มาของแต่ละค่า (จาก GPS / จากเสียง / แก้เอง) และแก้เองได้ทุกช่อง ข้อความแชร์ใส่ที่อยู่ให้
+- การดึงที่อยู่เป็นโหมดที่เลือกเปิดเอง (ปิดไว้ก่อน และขอให้กดยอมรับก่อน เพราะส่งพิกัดให้บริการแผนที่ของเครื่อง) เมื่อเปิด คลังจะเติมที่อยู่ให้เอง ถ้าไม่มีเน็ตก็ข้ามไปเงียบๆ และใช้อย่างอื่นได้ตามปกติ
 - หลังรวมคลิป แอปบอกว่าไฟล์อยู่ที่ไหน แสดงในการ์ดเหตุการณ์ และบันทึกลงแกลเลอรีได้ (Movies/SafetyRoadWatch, Android 10 ขึ้นไป)
 
 ### เปลี่ยน
