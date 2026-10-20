@@ -35,4 +35,12 @@ class ParseTest {
         assertNull(r.province)
         assertEquals(emptyList<String>(), r.violations)
     }
+
+    @Test
+    fun kilometerMarker() {
+        assertEquals("45", parse("ทะเบียน 8กค3692 กิโลเมตรที่ 45 ควันดำ").km)
+        assertEquals("12+500", parse("หลักกิโล ๑๒ + ๕๐๐ ล้อล้น").km)
+        assertEquals("7", parse("กม. 7").km)
+        assertNull(parse("ทะเบียน 8กค3692 ควันดำ").km)
+    }
 }

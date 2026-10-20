@@ -34,8 +34,10 @@
         android:layout_height="150dp"
         android:layout_gravity="bottom"
         android:layout_margin="16dp"
-        android:backgroundTint="#D32F2F"
+        android:backgroundTint="#8043A047"
         android:text="@string/btn_catch"
         android:textColor="#FFFFFF"
+        android:shadowColor="#80000000"
+        android:shadowRadius="4"
         android:textSize="40sp" />
 </FrameLayout>

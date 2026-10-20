@@ -128,6 +128,8 @@ class MainActivity : AppCompatActivity() {
             put("plate", p.plate ?: JSONObject.NULL)
             put("province", p.province ?: JSONObject.NULL)
             put("violations", JSONArray(p.violations))
+            put("km", p.km ?: JSONObject.NULL)
+            if (p.km != null) put("place_src", JSONObject().put("km", "voice"))
             put("note", note)
         }
         val parts = listOfNotNull(p.plate, p.province) + p.violations
