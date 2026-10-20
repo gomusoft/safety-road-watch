@@ -2,6 +2,7 @@ package watch.saferoad
 
 import android.content.ActivityNotFoundException
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -49,6 +50,47 @@ class LibraryActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         render()
+        if (lookupOn()) autoFetch()
+    }
+
+    private val prefs by lazy { getSharedPreferences("settings", Context.MODE_PRIVATE) }
+    private fun lookupOn() = prefs.getBoolean("place_lookup", false)
+
+    /** The user must accept before any coordinate is sent to the phone's map service. */
+    private fun askLookupConsent(onYes: () -> Unit) {
+        AlertDialog.Builder(this)
+            .setTitle("ดึงที่อยู่จาก GPS")
+            .setMessage(
+                "แอปจะส่งพิกัดของเหตุการณ์ให้บริการแผนที่ของเครื่อง (เช่น Google) เพื่อหาถนน ตำบล อำเภอ จังหวัด " +
+                    "ต้องใช้อินเทอร์เน็ต พิกัดจึงออกจากเครื่องไปที่บริการนั้น\n\n" +
+                    "ถ้าไม่ยอมรับ แอปยังใช้งานได้ปกติ และยังพิมพ์ที่อยู่เองได้ ถ้าไม่มีเน็ต แอปก็ยังใช้งานได้ปกติเช่นกัน",
+            )
+            .setPositiveButton("ยอมรับ") { _, _ ->
+                prefs.edit().putBoolean("place_lookup", true).apply()
+                render()
+                onYes()
+            }
+            .setNegativeButton("ไม่ยอมรับ", null)
+            .show()
+    }
+
+    /** Fills the place of events that have GPS but no address yet. Quietly gives up when offline. */
+    private fun autoFetch() {
+        val todo = store.list().filter { it.lat != null && it.lon != null && it.place.src.isEmpty() && it.place.text().isEmpty() }
+        if (todo.isEmpty()) return
+        Thread {
+            var any = false
+            for (e in todo) {
+                val p = try {
+                    store.lookupPlace(e.lat!!, e.lon!!)
+                } catch (ex: Exception) {
+                    null
+                } ?: break // offline or no service: stop, try again next time
+                store.savePlace(e.dir, Place(p.road, null, p.tambon, p.amphoe, p.changwat, p.src))
+                any = true
+            }
+            if (any) runOnUiThread { if (!isFinishing) render() }
+        }.start()
     }
 
     override fun onPause() {
@@ -84,6 +126,20 @@ class LibraryActivity : AppCompatActivity() {
     private fun render() {
         stopPlayer()
         list.removeAllViews()
+        list.addView(CheckBox(this).apply {
+            text = "ดึงที่อยู่จาก GPS อัตโนมัติ (ใช้เน็ต)"
+            setTextColor(Color.BLACK)
+            isChecked = lookupOn()
+            setOnCheckedChangeListener { v, on ->
+                if (on == lookupOn()) return@setOnCheckedChangeListener
+                if (on) {
+                    v.isChecked = false
+                    askLookupConsent { autoFetch() }
+                } else {
+                    prefs.edit().putBoolean("place_lookup", false).apply()
+                }
+            }
+        })
         val events = store.list()
         if (events.isEmpty()) list.addView(text("ยังไม่มีเหตุการณ์ที่บันทึกไว้", 18f))
         for (e in events) list.addView(card(e))
@@ -114,7 +170,9 @@ class LibraryActivity : AppCompatActivity() {
         }
         if (names.all { p.value(it.first) == null }) card.addView(text("ยังไม่มีที่อยู่: กด \"ดึงที่อยู่\" (จาก GPS) หรือแก้เอง", 14f))
         val placeRow = row(
-            button("ดึงที่อยู่", R.drawable.ic_place) { fetchPlace(e) }.apply { isEnabled = hasGps },
+            button("ดึงที่อยู่", R.drawable.ic_place) {
+                if (lookupOn()) fetchPlace(e) else askLookupConsent { fetchPlace(e) }
+            }.apply { isEnabled = hasGps },
             button("แก้ที่อยู่ / กม.", R.drawable.ic_edit) { editPlace(e) },
         )
         card.addView(placeRow)
@@ -292,7 +350,7 @@ class LibraryActivity : AppCompatActivity() {
             }
             runOnUiThread {
                 if (isFinishing) return@runOnUiThread
-                if (p == null) Toast.makeText(this, "ดึงที่อยู่ไม่ได้ ลองเปิดเน็ตหรือกดแก้เอง", Toast.LENGTH_LONG).show() else render()
+                if (p == null) Toast.makeText(this, "ดึงที่อยู่ไม่ได้ (ไม่มีเน็ตหรือไม่มีบริการแผนที่) ใช้งานอย่างอื่นต่อได้ หรือกดแก้เอง", Toast.LENGTH_LONG).show() else render()
             }
         }.start()
     }

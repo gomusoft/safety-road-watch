@@ -51,7 +51,7 @@ Clip offsets shown in the library are computed from the clip file name against t
 ## Storage and privacy
 
 - Everything lives in app-private storage (`filesDir`). Uninstalling the app deletes all events.
-- The only way data leaves the phone is the user pressing **Share**.
+- Data leaves the phone only when the user presses **Share**, or after they accept the opt-in address lookup (the phone's geocoder sends the coordinate to its map service). Lookup failures (offline) are ignored; nothing else depends on the internet.
 - The repo is public: `.gitignore` blocks `*.mp4`, `*.wav`, `*.pcm`, `*.m4a`. Never commit real evidence.
 
 ## Build, CI and releases
