@@ -30,6 +30,15 @@ object Thumb {
         }
     }
 
+    /** A captured still picture, shrunk for the library strip. Blocking: call off the main thread. */
+    fun still(f: File): Bitmap? {
+        val key = "${f.path}:${f.lastModified()}"
+        small.get(key)?.let { return it }
+        val bmp = BitmapFactory.decodeFile(f.path, BitmapFactory.Options().apply { inSampleSize = 4 }) ?: return null
+        small.put(key, bmp)
+        return bmp
+    }
+
     private fun startOf(f: File) = f.name.removePrefix("clip_").removeSuffix(".mp4").toLongOrNull()
 
     /** Blocking (decodes video): call off the main thread. Null when there is no clip yet or it cannot be read. */

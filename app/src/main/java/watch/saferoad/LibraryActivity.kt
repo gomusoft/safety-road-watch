@@ -16,6 +16,7 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -163,6 +164,27 @@ class LibraryActivity : AppCompatActivity() {
             val b = button("ฟังเสียง", R.drawable.ic_play) {}
             b.setOnClickListener { toggleVoice(wav, b) }
             card.addView(row(b))
+        }
+
+        val stills = e.dir.listFiles { f -> f.name.startsWith("still_") && f.name.endsWith(".jpg") }?.sortedBy { it.name } ?: emptyList()
+        if (stills.isNotEmpty()) {
+            card.addView(text("ภาพที่จับไว้ (${stills.size}) ส่งไปพร้อมตอนแชร์", 13f))
+            val strip = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+            for (f in stills) {
+                val pic = ImageView(this).apply {
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    setBackgroundColor(0xFFCCCCCC.toInt())
+                    setOnClickListener {
+                        startActivity(Intent(this@LibraryActivity, ImageActivity::class.java).putExtra("path", f.path).putExtra("deletable", true))
+                    }
+                    pool.execute {
+                        val bmp = Thumb.still(f)
+                        if (bmp != null) runOnUiThread { if (!isFinishing) setImageBitmap(bmp) }
+                    }
+                }
+                strip.addView(pic, LinearLayout.LayoutParams(dp(96), dp(54)).apply { marginEnd = dp(6); topMargin = dp(4); bottomMargin = dp(8) })
+            }
+            card.addView(HorizontalScrollView(this).apply { addView(strip) })
         }
 
         val checks = ArrayList<Pair<CheckBox, File>>()
@@ -395,8 +417,10 @@ class LibraryActivity : AppCompatActivity() {
             "ความผิด: ${e.violations.joinToString(", ")}\n" +
             "สถานที่: $place"
         val still = File(e.dir, "thumb.jpg").takeIf { it.exists() }
-        val i = Intent(Intent.ACTION_SEND_MULTIPLE).setType(if (still != null) "*/*" else "video/mp4")
-            .putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList((listOfNotNull(still) + send).map { uri(it) }))
+        val captured = e.dir.listFiles { f -> f.name.startsWith("still_") && f.name.endsWith(".jpg") }?.sortedBy { it.name } ?: emptyList()
+        val pictures = listOfNotNull(still) + captured
+        val i = Intent(Intent.ACTION_SEND_MULTIPLE).setType(if (pictures.isNotEmpty()) "*/*" else "video/mp4")
+            .putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList((pictures + send).map { uri(it) }))
             .putExtra(Intent.EXTRA_TEXT, report)
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivity(Intent.createChooser(i, "แชร์"))

@@ -17,7 +17,10 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 - Swipe a clip sideways in the library to delete just that clip (asks first).
 - Video stabilization setting, on by default; phones whose camera cannot do it show it greyed out with the reason.
 
+- While watching a video you can zoom in with two fingers (or double tap) and drag, to read a plate. "จับภาพ" saves the frame on screen as a still picture of the event; you can take several. They appear under the event, open full screen with zoom (and can be deleted), and are sent along when you share.
+
 ### Changed
+- The in-app player has its own play/pause button and a seek bar.
 - Clips you untick in the library stay unticked after you watch another clip and come back.
 - The voice note filters out engine rumble and road vibration, and uses the phone's own noise suppression when it has it, so your voice is easier to hear and to transcribe in a noisy car.
 - Video is recorded in 20-second pieces instead of 10, so there are about half as many tiny jumps between clips. The "before" and "after" parts now run 30 to 50 seconds (whole clips).
@@ -43,7 +46,10 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 - ปัดคลิปไปทางซ้ายหรือขวาในคลังเพื่อลบเฉพาะคลิปนั้น (ถามยืนยันก่อน)
 - ตั้งค่ากันภาพสั่นของวิดีโอ เปิดไว้ให้เป็นค่าเริ่มต้น ถ้ากล้องของเครื่องทำไม่ได้จะเป็นสีจางพร้อมบอกเหตุผล
 
+- ตอนดูวิดีโอ ซูมได้ด้วยสองนิ้ว (หรือแตะสองครั้ง) และลากดูส่วนอื่น เพื่ออ่านทะเบียนให้ชัด ปุ่ม "จับภาพ" เก็บภาพที่เห็นบนจอเป็นรูปนิ่งของเหตุการณ์ จับได้หลายภาพ รูปจะอยู่ใต้เหตุการณ์ กดดูเต็มจอและซูมได้ (ลบได้) และถูกส่งไปพร้อมตอนแชร์
+
 ### เปลี่ยน
+- เครื่องเล่นในแอปมีปุ่มเล่น/หยุดและแถบเลื่อนของตัวเอง
 - คลิปที่เอาติ๊กออกในคลังยังคงไม่ติ๊กหลังไปดูคลิปอื่นแล้วกลับมา
 - เสียงบันทึกตัดเสียงเครื่องยนต์และเสียงสั่นของถนนออก และใช้ตัวลดเสียงรบกวนของเครื่องถ้ามี ทำให้ได้ยินเสียงพูดชัดขึ้นและถอดเสียงได้ดีขึ้นในรถที่เสียงดัง
 - อัดวิดีโอเป็นท่อนละ 20 วินาทีแทน 10 วินาที รอยต่อสะดุดเล็กๆ ระหว่างคลิปจึงลดลงประมาณครึ่งหนึ่ง ช่วงก่อนกดและหลังกดจะยาว 30 ถึง 50 วินาที (ครบทั้งคลิป)
