@@ -19,8 +19,10 @@ Rules for every agent working in this repo (Claude, Gemini, Codex, Copilot, Curs
 - **Safety rule:** anything used while driving must work with one big tap or a hardware key.
 - **Scope:** KISS and YAGNI. Native Kotlin, Android Views, CameraX only. Add a library only when the feature cannot be
   done reasonably without it, and check its licence is compatible with CC BY-NC-SA 4.0.
-- **Branch model: `main` only.** Work on short branches (`feature/`, `fix/`, `docs/`, `chore/`, `claude/`) merged
-  into `main` by squash PR. Never push directly to `main`.
+- **Branch model: `main` only** (dev-pose standards 02, lane `direct`). Work branches follow the dev-pose naming,
+  lowercase kebab-case, based on `main` and squash-merged into `main` by PR: `feature/<slug>`, `fix/<slug>`,
+  `docs/<slug>`, `chore/<slug>`. No tool or agent prefixes such as `claude/`. Delete a branch after it merges.
+  Never push directly to `main`.
 - **Commits:** Conventional Commits with a scope (`feat(capture): …`), header 50 characters or less.
 - **CI must be green** before merge. CI is the only place the app is compiled when a session has no Android SDK.
 - **Changelog:** every user-visible change adds a line under `[Unreleased]` in `CHANGELOG.md` (English + Thai).
