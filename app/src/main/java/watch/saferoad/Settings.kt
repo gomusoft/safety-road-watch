@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 
-/** The few user choices, kept in SharedPreferences. Everything is off until the user turns it on. */
+/** The few user choices, kept in SharedPreferences. Everything is off until the user turns it on, except video stabilization. */
 object Settings {
     private fun prefs(c: Context) = c.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
@@ -15,6 +15,10 @@ object Settings {
     /** Open the camera straight away when the app starts, skipping the home screen. */
     fun autoStart(c: Context) = prefs(c).getBoolean("auto_start", false)
     fun setAutoStart(c: Context, on: Boolean) = prefs(c).edit().putBoolean("auto_start", on).apply()
+
+    /** Video stabilization is on unless the user turns it off; phones that cannot do it ignore it. */
+    fun stabilize(c: Context) = prefs(c).getBoolean("stabilize", true)
+    fun setStabilize(c: Context, on: Boolean) = prefs(c).edit().putBoolean("stabilize", on).apply()
 
     /** The user must accept before any coordinate is sent to the phone's map service. */
     fun askLookupConsent(a: AppCompatActivity, onYes: () -> Unit) {

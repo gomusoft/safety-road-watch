@@ -14,7 +14,11 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 - Address lookup is an opt-in mode (off by default, asks for your consent first, because it sends the coordinate to the phone's map service). When on, the library fills in missing addresses by itself; offline it quietly waits and everything else keeps working.
 - After merging clips the app says where the file is, shows it on the event card, and can save it to the gallery (Movies/SafetyRoadWatch, Android 10+).
 
+- Swipe a clip sideways in the library to delete just that clip (asks first).
+- Video stabilization setting, on by default; phones whose camera cannot do it show it greyed out with the reason.
+
 ### Changed
+- Clips you untick in the library stay unticked after you watch another clip and come back.
 - Video is recorded in 20-second pieces instead of 10, so there are about half as many tiny jumps between clips. The "before" and "after" parts now run 30 to 50 seconds (whole clips).
 - Settings: each option is a card you can tap anywhere, with a clear on/off switch.
 - The library works in both portrait and landscape and turns with the phone, even if auto-rotate is locked, so you no longer have to rotate back and forth after capturing.
@@ -35,7 +39,11 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 - การดึงที่อยู่เป็นโหมดที่เลือกเปิดเอง (ปิดไว้ก่อน และขอให้กดยอมรับก่อน เพราะส่งพิกัดให้บริการแผนที่ของเครื่อง) เมื่อเปิด คลังจะเติมที่อยู่ให้เอง ถ้าไม่มีเน็ตก็ข้ามไปเงียบๆ และใช้อย่างอื่นได้ตามปกติ
 - หลังรวมคลิป แอปบอกว่าไฟล์อยู่ที่ไหน แสดงในการ์ดเหตุการณ์ และบันทึกลงแกลเลอรีได้ (Movies/SafetyRoadWatch, Android 10 ขึ้นไป)
 
+- ปัดคลิปไปทางซ้ายหรือขวาในคลังเพื่อลบเฉพาะคลิปนั้น (ถามยืนยันก่อน)
+- ตั้งค่ากันภาพสั่นของวิดีโอ เปิดไว้ให้เป็นค่าเริ่มต้น ถ้ากล้องของเครื่องทำไม่ได้จะเป็นสีจางพร้อมบอกเหตุผล
+
 ### เปลี่ยน
+- คลิปที่เอาติ๊กออกในคลังยังคงไม่ติ๊กหลังไปดูคลิปอื่นแล้วกลับมา
 - อัดวิดีโอเป็นท่อนละ 20 วินาทีแทน 10 วินาที รอยต่อสะดุดเล็กๆ ระหว่างคลิปจึงลดลงประมาณครึ่งหนึ่ง ช่วงก่อนกดและหลังกดจะยาว 30 ถึง 50 วินาที (ครบทั้งคลิป)
 - ตั้งค่า: แต่ละตัวเลือกเป็นแถบกดได้ทั้งแถบ มีสวิตช์เปิด/ปิดที่ชัดเจน
 - คลังใช้ได้ทั้งแนวตั้งและแนวนอน หมุนตามเครื่อง แม้ปิดการหมุนอัตโนมัติไว้ ไม่ต้องหมุนเครื่องกลับไปมาหลังบันทึก

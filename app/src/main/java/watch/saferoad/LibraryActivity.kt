@@ -31,6 +31,7 @@ class LibraryActivity : AppCompatActivity() {
     private lateinit var store: EventStore
     private lateinit var list: LinearLayout
     private var player: MediaPlayer? = null
+    private val skipped = HashSet<String>() // clips the user unticked; kept so they stay unticked after watching a clip
     private val pool = Executors.newFixedThreadPool(2) // video frames are decoded one or two at a time
 
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
@@ -168,18 +169,21 @@ class LibraryActivity : AppCompatActivity() {
         for (f in clips) {
             val start = f.name.removePrefix("clip_").removeSuffix(".mp4").toLongOrNull() ?: e.time
             val off = Math.round((start - e.time) / 1000.0).toInt()
+            val label = if (off >= 0) "+${off}s" else "${off}s"
             val cb = CheckBox(this).apply {
-                isChecked = true
+                isChecked = f.path !in skipped
                 setTextColor(Color.BLACK)
-                text = if (off >= 0) "+${off}s" else "${off}s"
+                text = label
+                setOnCheckedChangeListener { _, on -> if (on) skipped.remove(f.path) else skipped.add(f.path) }
             }
             checks.add(cb to f)
-            val line = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+            val line = SwipeRow(this) { confirmDeleteClip(f, label) }.apply { orientation = LinearLayout.HORIZONTAL }
             line.addView(stillOf(f), LinearLayout.LayoutParams(dp(96), dp(54)).apply { marginEnd = dp(8) })
             line.addView(cb, LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f))
             line.addView(button("ดู", R.drawable.ic_play) { playClip(f) }, LinearLayout.LayoutParams(dp(110), WRAP_CONTENT))
             card.addView(line)
         }
+        if (clips.isNotEmpty()) card.addView(text("ปัดคลิปไปทางซ้ายหรือขวาเพื่อลบคลิปนั้น", 12f).apply { setTextColor(0xFF555555.toInt()) })
         val selected = { checks.filter { it.first.isChecked }.map { it.second } }
 
         card.addView(row(
@@ -396,6 +400,18 @@ class LibraryActivity : AppCompatActivity() {
             .putExtra(Intent.EXTRA_TEXT, report)
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivity(Intent.createChooser(i, "แชร์"))
+    }
+
+    private fun confirmDeleteClip(f: File, label: String) {
+        AlertDialog.Builder(this)
+            .setMessage("ลบคลิป $label นี้? กู้คืนไม่ได้ (วิดีโอที่รวมไว้แล้วไม่หาย)")
+            .setPositiveButton("ลบ") { _, _ ->
+                f.delete()
+                skipped.remove(f.path)
+                render()
+            }
+            .setNegativeButton("ยกเลิก", null)
+            .show()
     }
 
     private fun confirmDelete(e: EventInfo) {
