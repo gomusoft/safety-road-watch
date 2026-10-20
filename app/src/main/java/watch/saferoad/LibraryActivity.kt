@@ -1,6 +1,5 @@
 package watch.saferoad
 
-import android.content.ActivityNotFoundException
 import android.content.ContentValues
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -17,6 +16,7 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -117,6 +117,20 @@ class LibraryActivity : AppCompatActivity() {
             layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply { bottomMargin = dp(12) }
         }
         card.addView(text(e.iso.replace('T', ' '), 14f, true))
+        val clips = e.dir.listFiles { f -> f.name.startsWith("clip_") && f.name.endsWith(".mp4") }
+            ?.sortedBy { it.name } ?: emptyList()
+        if (clips.isNotEmpty()) {
+            val pic = ImageView(this).apply {
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                setBackgroundColor(0xFFCCCCCC.toInt())
+                setOnClickListener { playClip(File(e.dir, "merged.mp4").takeIf { it.exists() } ?: clips.first()) }
+            }
+            card.addView(pic, LinearLayout.LayoutParams(MATCH_PARENT, dp(180)).apply { topMargin = dp(4); bottomMargin = dp(8) })
+            Thread {
+                val bmp = Thumb.load(e)
+                if (bmp != null) runOnUiThread { if (!isFinishing) pic.setImageBitmap(bmp) }
+            }.start()
+        }
         val who = listOfNotNull(e.plate, e.province).joinToString(" ")
         card.addView(text(who.ifEmpty { "ไม่ได้ยินทะเบียน" }, 20f, true))
         if (e.violations.isNotEmpty()) card.addView(text("ความผิด: " + e.violations.joinToString(", ")))
@@ -149,8 +163,6 @@ class LibraryActivity : AppCompatActivity() {
         }
 
         val checks = ArrayList<Pair<CheckBox, File>>()
-        val clips = e.dir.listFiles { f -> f.name.startsWith("clip_") && f.name.endsWith(".mp4") }
-            ?.sortedBy { it.name } ?: emptyList()
         for (f in clips) {
             val start = f.name.removePrefix("clip_").removeSuffix(".mp4").toLongOrNull() ?: e.time
             val off = Math.round((start - e.time) / 1000.0).toInt()
@@ -187,15 +199,7 @@ class LibraryActivity : AppCompatActivity() {
 
     private fun uri(f: File): Uri = FileProvider.getUriForFile(this, "$packageName.files", f)
 
-    private fun playClip(f: File) {
-        val i = Intent(Intent.ACTION_VIEW).setDataAndType(uri(f), "video/mp4")
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        try {
-            startActivity(i)
-        } catch (ex: ActivityNotFoundException) {
-            Toast.makeText(this, "ไม่มีแอปเล่นวิดีโอ", Toast.LENGTH_SHORT).show()
-        }
-    }
+    private fun playClip(f: File) = startActivity(Intent(this, PlayerActivity::class.java).putExtra("path", f.path))
 
     private fun toggleVoice(f: File, b: Button) {
         if (player != null) {
@@ -366,8 +370,9 @@ class LibraryActivity : AppCompatActivity() {
             "ทะเบียน: ${e.plate ?: "-"} ${e.province ?: ""}\n" +
             "ความผิด: ${e.violations.joinToString(", ")}\n" +
             "สถานที่: $place"
-        val i = Intent(Intent.ACTION_SEND_MULTIPLE).setType("video/mp4")
-            .putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(send.map { uri(it) }))
+        val still = File(e.dir, "thumb.jpg").takeIf { it.exists() }
+        val i = Intent(Intent.ACTION_SEND_MULTIPLE).setType(if (still != null) "*/*" else "video/mp4")
+            .putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList((listOfNotNull(still) + send).map { uri(it) }))
             .putExtra(Intent.EXTRA_TEXT, report)
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivity(Intent.createChooser(i, "แชร์"))
