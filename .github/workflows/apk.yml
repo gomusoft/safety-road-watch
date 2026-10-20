@@ -2,6 +2,8 @@ name: apk
 
 on:
   push:
+    branches: ['**']
+    tags: ['v*.*.*']
   pull_request:
   workflow_dispatch:
 
@@ -31,12 +33,23 @@ jobs:
         with:
           name: safety-road-watch-apk
           path: safety-road-watch.apk
-      # A fixed "latest" release so the phone can download the newest APK from one link.
-      - if: github.event_name == 'push'
+      # Rolling test build: one stable link to the newest APK from main.
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete latest --yes --cleanup-tag || true
           gh release create latest safety-road-watch.apk --target "$GITHUB_SHA" \
-            --title "Latest build (${GITHUB_REF_NAME} ${GITHUB_SHA::7})" \
-            --notes "Debug APK built from ${GITHUB_REF_NAME} @ ${GITHUB_SHA::7}." --prerelease
+            --title "Latest test build (main ${GITHUB_SHA::7})" \
+            --notes "Newest build from main @ ${GITHUB_SHA::7}. For a stable version use a vX.Y.Z release." --prerelease
+      # Versioned release: notes are this version's section of CHANGELOG.md.
+      - if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          awk -v v="$v" '$0 ~ "^## \\[" v "\\]" {on=1; next} on && /^## \[/ {exit} on' CHANGELOG.md > notes.md
+          test -s notes.md || { echo "CHANGELOG.md has no section for $v"; exit 1; }
+          cp safety-road-watch.apk "safety-road-watch-$GITHUB_REF_NAME.apk"
+          gh release create "$GITHUB_REF_NAME" "safety-road-watch-$GITHUB_REF_NAME.apk" \
+            --title "Safety Road Watch $GITHUB_REF_NAME" --notes-file notes.md --verify-tag

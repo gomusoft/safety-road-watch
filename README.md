@@ -33,9 +33,21 @@ Safety Road Watch ทำให้คนขับธรรมดาช่วย�
 - ข้อมูลทั้งหมดอยู่ในเครื่อง ถ้าลบแอป ข้อมูลหายหมด
 
 ## ดาวน์โหลด APK
-ทุก push จะสร้าง APK ใหม่ไว้ที่ release **latest** ของ repo นี้ (ใบรับรอง debug ตัวเดิมทุกครั้ง จึงติดตั้งทับได้โดยข้อมูลไม่หาย)
+- **รุ่นเสถียร:** [Releases](https://github.com/gomusoft/safety-road-watch/releases) (เช่น v0.1.0) พร้อมบันทึกการเปลี่ยนแปลง
+- **รุ่นทดสอบล่าสุด:** [latest](https://github.com/gomusoft/safety-road-watch/releases/download/latest/safety-road-watch.apk) สร้างใหม่ทุกครั้งที่มีการ merge เข้า `main`
 
-## Build
+ทุกรุ่นเซ็นด้วยใบรับรองตัวเดียวกัน จึงติดตั้งทับได้โดยข้อมูลไม่หาย
+
+## สำหรับนักพัฒนา
+- เหตุผลและความต้องการ: [docs/product.md](docs/product.md)
+- สถาปัตยกรรม: [docs/architecture.md](docs/architecture.md)
+- แผนต่อไป: [docs/roadmap.md](docs/roadmap.md)
+- ช่องทางแจ้งและรางวัล: [docs/reporting-channels.md](docs/reporting-channels.md)
+- วิธีร่วมพัฒนาและออกรุ่น: [CONTRIBUTING.md](CONTRIBUTING.md) · [CHANGELOG.md](CHANGELOG.md) · [SECURITY.md](SECURITY.md)
+
 ```
-gradle assembleDebug   # Gradle 8.14, JDK 17, Android SDK 35
+gradle testDebugUnitTest assembleDebug   # Gradle 8.14, JDK 17, Android SDK 35
 ```
+
+## License
+[CC BY-NC-SA 4.0](LICENSE): ใช้ แก้ไข และแจกต่อได้ฟรี ห้ามใช้เชิงพาณิชย์ และงานที่ดัดแปลงต้องเปิดเผยภายใต้สัญญาอนุญาตเดียวกัน

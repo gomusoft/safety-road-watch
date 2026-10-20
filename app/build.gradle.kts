@@ -12,7 +12,9 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInt()
-        versionName = "0.1.${versionCode}"
+        // Tag builds (vX.Y.Z) use the tag; everything else is a dev build.
+        versionName = System.getenv("GITHUB_REF_NAME")?.takeIf { it.matches(Regex("v\\d+\\.\\d+\\.\\d+")) }
+            ?.removePrefix("v") ?: "dev.$versionCode"
     }
 
     // Committed debug key (public, not a secret) so every CI build installs over the last one
