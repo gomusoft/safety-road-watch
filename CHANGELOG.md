@@ -13,6 +13,7 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 - After merging clips the app says where the file is, shows it on the event card, and can save it to the gallery (Movies/SafetyRoadWatch, Android 10+).
 
 ### Changed
+- Video is recorded in 20-second pieces instead of 10, so there are about half as many tiny jumps between clips. The "before" and "after" parts now run 30 to 50 seconds (whole clips).
 - The library works in both portrait and landscape and turns with the phone, even if auto-rotate is locked, so you no longer have to rotate back and forth after capturing.
 - The voice note now ends 8 seconds after you stop talking (up to 45 s) instead of a fixed 12 s; speak again before that and it keeps recording, or press the button to end it.
 - While the voice note is recording the button turns yellow and pulses, with a big banner and a light vibration.
@@ -30,6 +31,7 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 - หลังรวมคลิป แอปบอกว่าไฟล์อยู่ที่ไหน แสดงในการ์ดเหตุการณ์ และบันทึกลงแกลเลอรีได้ (Movies/SafetyRoadWatch, Android 10 ขึ้นไป)
 
 ### เปลี่ยน
+- อัดวิดีโอเป็นท่อนละ 20 วินาทีแทน 10 วินาที รอยต่อสะดุดเล็กๆ ระหว่างคลิปจึงลดลงประมาณครึ่งหนึ่ง ช่วงก่อนกดและหลังกดจะยาว 30 ถึง 50 วินาที (ครบทั้งคลิป)
 - คลังใช้ได้ทั้งแนวตั้งและแนวนอน หมุนตามเครื่อง แม้ปิดการหมุนอัตโนมัติไว้ ไม่ต้องหมุนเครื่องกลับไปมาหลังบันทึก
 - บันทึกเสียงจบเองเมื่อเงียบไป 8 วินาที (สูงสุด 45 วินาที) แทน 12 วินาทีตายตัว ถ้าพูดต่อก่อนครบ 8 วินาทีก็อัดต่อ หรือกดปุ่มเพื่อจบเอง
 - ระหว่างอัดเสียง ปุ่มเปลี่ยนเป็นสีเหลืองกะพริบ มีแถบข้อความตัวใหญ่ และเครื่องสั่นเบาๆ

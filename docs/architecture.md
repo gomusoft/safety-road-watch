@@ -10,7 +10,7 @@ Package `watch.saferoad`, minSdk 26, target/compile SDK 35, JDK 17.
 | `HomeActivity.kt` | Launcher screen (dark): big start button, library with event count, settings, and a one-line readiness check for camera / mic / GPS permissions (tap to ask). Opens the camera at once when the "open camera on start" setting is on |
 | `SettingsActivity.kt`, `Settings.kt` | Two choices kept in `SharedPreferences`, both off by default: address lookup from GPS (asks for consent first) and open the camera on start. Also shows the version |
 | `MainActivity.kt` | Dashcam screen. Permissions, capture button and hardware keys (`onKeyDown`), status text, TTS confirmation, saves the parsed result into the event |
-| `Recorder.kt` (class `Rolling`) | Rolling video: back camera, `VideoCapture<Recorder>` at HD, **no audio**. Records 10 s segments to `filesDir/ring/seg_<startMillis>.mp4`, keeps the newest 4. On trigger, moves recent segments into the event and keeps routing new segments there until trigger + 30 s |
+| `Recorder.kt` (class `Rolling`) | Rolling video: back camera, `VideoCapture<Recorder>` at HD, **no audio**. Records 20 s segments to `filesDir/ring/seg_<startMillis>.mp4`, keeps the newest 4. On trigger, moves recent segments into the event and keeps routing new segments there until trigger + 30 s |
 | `Voice.kt` | Voice note: `AudioRecord` 16 kHz mono PCM16 on a background thread, writes `voice.wav`; then transcribes the PCM with `SpeechRecognizer` + `RecognizerIntent.EXTRA_AUDIO_SOURCE` (API 33+), on-device recognizer if available |
 | `Parse.kt` | Pure Kotlin (no Android imports, unit tested in `app/src/test`). Normalises spoken letter names and Thai digits, extracts plate, province (77 + aliases) and violation keywords |
 | `EventStore.kt` | Creates event folders, reads/writes `event.json`, tracks location (GPS + network listeners while the camera screen is visible, last-known fallback) |
@@ -20,7 +20,7 @@ Package `watch.saferoad`, minSdk 26, target/compile SDK 35, JDK 17.
 ## Flow
 
 ```
-camera ──10 s segments──▶ filesDir/ring/  (newest 4 kept, video only)
+camera ──20 s segments──▶ filesDir/ring/  (newest 4 kept, video only)
                 │
 press / BT key ─┤ trigger
                 ▼
@@ -77,7 +77,7 @@ Clip offsets shown in the library are computed from the clip file name against t
 | Risk | Effect | Mitigation |
 |---|---|---|
 | `EXTRA_AUDIO_SOURCE` needs API 33 and a recogniser that honours it | No transcript on older phones or some recognisers | `voice.wav` is always kept; note explains why |
-| ~100 ms gap between 10 s segments | Tiny jumps in merged video | Acceptable for evidence; could switch to one long recording + trimming later |
+| ~100 ms gap between 20 s segments (was 10 s: twice as many joins) | Tiny jumps in merged video, about 2 to 3 per event | Acceptable for evidence. Zero gap needs our own `MediaCodec` encoder with an in-memory ring of encoded frames (a rewrite of `Recorder.kt`, and CameraX would have to feed it); only if the joins still bother in the field |
 | Recording stops when the app is not in the foreground (library open, screen off) | No pre-roll right after returning | Keep the camera screen open while driving; a foreground service is on the roadmap |
 | Bluetooth media keys may be taken by another app's media session | Remote does nothing | Volume keys work more reliably; a `MediaSession` is on the roadmap |
 | Phone heat and storage | Throttling, full storage | HD only; ring keeps ~40 s; events are deleted by the user |
