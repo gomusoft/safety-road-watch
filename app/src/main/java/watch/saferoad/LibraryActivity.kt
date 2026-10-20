@@ -1,6 +1,5 @@
 package watch.saferoad
 
-import android.content.ActivityNotFoundException
 import android.content.ContentValues
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -17,6 +16,7 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -25,11 +25,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import java.io.File
+import java.util.concurrent.Executors
 
 class LibraryActivity : AppCompatActivity() {
     private lateinit var store: EventStore
     private lateinit var list: LinearLayout
     private var player: MediaPlayer? = null
+    private val pool = Executors.newFixedThreadPool(2) // video frames are decoded one or two at a time
 
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
 
@@ -117,6 +119,20 @@ class LibraryActivity : AppCompatActivity() {
             layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply { bottomMargin = dp(12) }
         }
         card.addView(text(e.iso.replace('T', ' '), 14f, true))
+        val clips = e.dir.listFiles { f -> f.name.startsWith("clip_") && f.name.endsWith(".mp4") }
+            ?.sortedBy { it.name } ?: emptyList()
+        if (clips.isNotEmpty()) {
+            val pic = ImageView(this).apply {
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                setBackgroundColor(0xFFCCCCCC.toInt())
+                setOnClickListener { playClip(File(e.dir, "merged.mp4").takeIf { it.exists() } ?: clips.first()) }
+            }
+            card.addView(pic, LinearLayout.LayoutParams(MATCH_PARENT, dp(180)).apply { topMargin = dp(4); bottomMargin = dp(8) })
+            pool.execute {
+                val bmp = Thumb.load(e)
+                if (bmp != null) runOnUiThread { if (!isFinishing) pic.setImageBitmap(bmp) }
+            }
+        }
         val who = listOfNotNull(e.plate, e.province).joinToString(" ")
         card.addView(text(who.ifEmpty { "ไม่ได้ยินทะเบียน" }, 20f, true))
         if (e.violations.isNotEmpty()) card.addView(text("ความผิด: " + e.violations.joinToString(", ")))
@@ -149,8 +165,6 @@ class LibraryActivity : AppCompatActivity() {
         }
 
         val checks = ArrayList<Pair<CheckBox, File>>()
-        val clips = e.dir.listFiles { f -> f.name.startsWith("clip_") && f.name.endsWith(".mp4") }
-            ?.sortedBy { it.name } ?: emptyList()
         for (f in clips) {
             val start = f.name.removePrefix("clip_").removeSuffix(".mp4").toLongOrNull() ?: e.time
             val off = Math.round((start - e.time) / 1000.0).toInt()
@@ -161,6 +175,7 @@ class LibraryActivity : AppCompatActivity() {
             }
             checks.add(cb to f)
             val line = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+            line.addView(stillOf(f), LinearLayout.LayoutParams(dp(96), dp(54)).apply { marginEnd = dp(8) })
             line.addView(cb, LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f))
             line.addView(button("ดู", R.drawable.ic_play) { playClip(f) }, LinearLayout.LayoutParams(dp(110), WRAP_CONTENT))
             card.addView(line)
@@ -176,6 +191,7 @@ class LibraryActivity : AppCompatActivity() {
         val merged = File(e.dir, "merged.mp4")
         if (merged.exists()) {
             card.addView(text("คลิปที่รวมแล้ว: ${"%.1f".format(merged.length() / 1048576.0)} MB (อยู่ในแอป)", 13f))
+            card.addView(stillOf(merged), LinearLayout.LayoutParams(dp(160), dp(90)).apply { bottomMargin = dp(4) })
             val open = button("เปิดดู", R.drawable.ic_play) { playClip(merged) }
             card.addView(
                 if (Build.VERSION.SDK_INT >= 29) row(open, button("บันทึกลงแกลเลอรี", R.drawable.ic_save) { saveToGallery(e, merged) })
@@ -185,17 +201,25 @@ class LibraryActivity : AppCompatActivity() {
         return card
     }
 
-    private fun uri(f: File): Uri = FileProvider.getUriForFile(this, "$packageName.files", f)
-
-    private fun playClip(f: File) {
-        val i = Intent(Intent.ACTION_VIEW).setDataAndType(uri(f), "video/mp4")
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        try {
-            startActivity(i)
-        } catch (ex: ActivityNotFoundException) {
-            Toast.makeText(this, "ไม่มีแอปเล่นวิดีโอ", Toast.LENGTH_SHORT).show()
+    /** Small picture of the first frame of a video file; tapping it plays the video. */
+    private fun stillOf(f: File) = ImageView(this).apply {
+        scaleType = ImageView.ScaleType.CENTER_CROP
+        setBackgroundColor(0xFFCCCCCC.toInt())
+        setOnClickListener { playClip(f) }
+        pool.execute {
+            val bmp = Thumb.first(f)
+            if (bmp != null) runOnUiThread { if (!isFinishing) setImageBitmap(bmp) }
         }
     }
+
+    override fun onDestroy() {
+        pool.shutdownNow()
+        super.onDestroy()
+    }
+
+    private fun uri(f: File): Uri = FileProvider.getUriForFile(this, "$packageName.files", f)
+
+    private fun playClip(f: File) = startActivity(Intent(this, PlayerActivity::class.java).putExtra("path", f.path))
 
     private fun toggleVoice(f: File, b: Button) {
         if (player != null) {
@@ -366,8 +390,9 @@ class LibraryActivity : AppCompatActivity() {
             "ทะเบียน: ${e.plate ?: "-"} ${e.province ?: ""}\n" +
             "ความผิด: ${e.violations.joinToString(", ")}\n" +
             "สถานที่: $place"
-        val i = Intent(Intent.ACTION_SEND_MULTIPLE).setType("video/mp4")
-            .putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(send.map { uri(it) }))
+        val still = File(e.dir, "thumb.jpg").takeIf { it.exists() }
+        val i = Intent(Intent.ACTION_SEND_MULTIPLE).setType(if (still != null) "*/*" else "video/mp4")
+            .putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList((listOfNotNull(still) + send).map { uri(it) }))
             .putExtra(Intent.EXTRA_TEXT, report)
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivity(Intent.createChooser(i, "แชร์"))
