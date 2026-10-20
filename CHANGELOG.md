@@ -6,6 +6,12 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 
 ## [Unreleased]
 
+### Fixed
+- The camera screen now keeps the screen on and shows over the lock screen, and recording restarts cleanly after the screen was off or after the library.
+
+### แก้ไข
+- หน้ากล้องเปิดจอค้างไว้และแสดงทับหน้าจอล็อกได้ และอัดต่อได้ถูกต้องหลังจอดับหรือกลับจากคลัง
+
 ## [0.1.0] - 2026-10-20
 
 First public build. / รุ่นแรกที่เปิดให้ใช้

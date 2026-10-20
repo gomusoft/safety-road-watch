@@ -28,6 +28,7 @@ class Rolling(private val activity: AppCompatActivity, private val store: EventS
 
     private var started = false
     private var running = false
+    private var generation = 0 // bumped by every start(), so a stale camera callback can tell it is stale
     private var videoCapture: VideoCapture<CxRecorder>? = null
     private var current: Recording? = null
     private var curStart = 0L
@@ -44,9 +45,10 @@ class Rolling(private val activity: AppCompatActivity, private val store: EventS
     fun start(view: PreviewView) {
         if (started) return
         started = true
+        val gen = ++generation
         val future = ProcessCameraProvider.getInstance(activity)
         future.addListener({
-            if (!started) return@addListener
+            if (!started || gen != generation) return@addListener
             val provider = future.get()
             val preview = Preview.Builder().build()
             preview.setSurfaceProvider(view.surfaceProvider)
@@ -114,11 +116,14 @@ class Rolling(private val activity: AppCompatActivity, private val store: EventS
     }
 
     private fun onFinalize(file: File, start: Long, error: Int) {
-        current = null
+        // After stop() + start() (screen off/on, library) the old segment's Finalize can arrive after the new
+        // segment began. A stale one must not clear `current`, flip `running` or start a second recording.
+        val mine = start == curStart
+        if (mine) current = null
         val dir = activeDir
         if (!file.exists() || file.length() == 0L) {
             file.delete()
-            if (error != VideoRecordEvent.Finalize.ERROR_NONE && running) {
+            if (mine && error != VideoRecordEvent.Finalize.ERROR_NONE && running) {
                 running = false // do not spin on a broken camera
                 onProblem?.invoke(error)
                 return
@@ -126,7 +131,7 @@ class Rolling(private val activity: AppCompatActivity, private val store: EventS
         } else if (dir != null && start < deadline) {
             moveTo(file, dir, start)
         }
-        if (running) startSegment()
+        if (mine && running) startSegment()
         // keep only the newest 4 finished segments
         ring.listFiles()
             ?.filter { startOf(it).let { s -> s != null && s != curStart } }
