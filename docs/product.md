@@ -28,7 +28,7 @@ one press, a short spoken note, keep driving. Review and send it after parking.
    No typing, no small targets while driving.
 2. **Privacy by design.**
    - The rolling dashcam video **never records audio**.
-   - The microphone is on **only** after the user presses capture, until they press again or 12 s pass.
+   - The microphone is on **only** after the user presses capture, until they press again, 8 s pass without speech, or 45 s pass.
    - All data stays on the device. The app has no backend, no analytics, no account.
 3. **Report to authorities, never shame.** The app shares evidence to official channels. It never posts publicly.
 4. **Smallest thing that works (KISS, YAGNI).** The owner had a ~3M-token budget for the whole project.
@@ -41,7 +41,7 @@ one press, a short spoken note, keep driving. Review and send it after parking.
 | R1 | Dashcam screen: back camera preview, screen stays on, video recorded continuously in a rolling buffer, **video only** | Built |
 | R2 | Capture by tapping the big button, or a Bluetooth remote / volume / play-pause / enter key | Built |
 | R3 | One capture = about **30 s before** and **30 s after** the press, kept as 10 s clips | Built |
-| R4 | After a capture press, record a voice note; stop on the next press or after 12 s | Built |
+| R4 | After a capture press, record a voice note; stop on the next press, after 8 s of silence (speech resumes the clock), or after 45 s. A new press is allowed at any time, even while the previous event still collects its 30 s or is being transcribed | Built |
 | R5 | Keep the voice note as a separate audio file (`voice.wav`) the user can replay | Built |
 | R6 | Transcribe the voice note (Thai, `th-TH`), on-device when available | Built (Android 13+ only) |
 | R7 | Extract plate (e.g. `8กค 3692`), province (77, with aliases like โคราช, กทม) and violation types from the transcript; letters spoken by name (กอไก่) are understood | Built, unit tested |
@@ -77,5 +77,6 @@ one press, a short spoken note, keep driving. Review and send it after parking.
 | 2026-10-20 | Discord reporting skipped for now (public project; owner will choose a personal or public server later) | Owner |
 | 2026-10-20 | Address (road, tambon, amphoe, province) is fetched only when the user presses a button, never automatically: the phone geocoder sends the coordinate to the map service over the internet, which breaks "nothing leaves the phone" if done silently. Kilometer marker comes from the voice note or typing: the phone geocoder does not return it, and speaking while driving is not required (the owner does not always know where they are), so GPS fills the rest. The library shows the coordinate and labels each value as from GPS, voice or edited. Merged video stays in the app until the user saves it to the gallery | Lead agent from owner request, owner to confirm |
 | 2026-10-20 | Supersedes the row above: the address lookup is an opt-in **mode** (off by default). Turning it on, or pressing "fetch address" while off, shows a consent dialog; accepting lets the library fill missing addresses automatically. Declining or having no internet never blocks anything else (recording, voice, merge, share, typing the address) | Owner |
+| 2026-10-20 | Voice note ends 8 s after the last speech (cap 45 s, was a fixed 12 s that cut people off). While the mic is on the button turns yellow and pulses (no red). A new capture can start at any time; events overlap and the later one gets copies of the footage already collected | Owner |
 | 2026-10-20 | Capture button on the camera screen: 50% transparent green with a shield, calm and not alarming | Owner |
 | 2026-10-20 | Agent team: an Opus-class lead designs and reviews; cheaper models (Sonnet) write the code, to save tokens | Owner |

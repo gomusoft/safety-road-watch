@@ -1,6 +1,13 @@
 package watch.saferoad
 
 import android.Manifest
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
+import android.view.HapticFeedbackConstants
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -27,7 +34,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var status: TextView
     private var tts: TextToSpeech? = null
     private var ttsOk = false
-    private var busy = false
+    private lateinit var catchBtn: Button
+    private val handler = Handler(Looper.getMainLooper())
+    private var pulse: ObjectAnimator? = null
+    private var showingResult = false
+    private val clearResult = Runnable {
+        showingResult = false
+        if (!voice.isRecording) status.setText(R.string.status_ready)
+    }
 
     private val askPermissions = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         startAll()
@@ -52,9 +66,10 @@ class MainActivity : AppCompatActivity() {
         store = EventStore(this)
         voice = Voice(this)
         rec = Rolling(this, store)
-        rec.onCollectEnd = { if (!busy) status.setText(R.string.status_ready) }
+        rec.onCollectEnd = { if (!voice.isRecording && !showingResult) status.setText(R.string.status_ready) }
         rec.onProblem = { status.text = "กล้องมีปัญหา (code $it)" }
-        findViewById<Button>(R.id.btnCatch).setOnClickListener { onCatch() }
+        catchBtn = findViewById(R.id.btnCatch)
+        catchBtn.setOnClickListener { onCatch() }
         findViewById<Button>(R.id.btnLibrary).setOnClickListener {
             startActivity(Intent(this, LibraryActivity::class.java))
         }
@@ -92,6 +107,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        pulse?.cancel()
+        handler.removeCallbacks(clearResult)
         voice.stop()
         tts?.shutdown()
         super.onDestroy()
@@ -114,21 +131,57 @@ class MainActivity : AppCompatActivity() {
             voice.stop() // finishes the voice note; Voice calls back when transcribed
             return
         }
-        if (busy) return
         val dir = rec.trigger()
         if (dir == null) {
-            if (!rec.collecting) status.text = "กล้องยังไม่พร้อม"
+            status.text = "กล้องยังไม่พร้อม"
             return
         }
+        catchBtn.performHapticFeedback(
+            if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.LONG_PRESS,
+        )
         if (!has(Manifest.permission.RECORD_AUDIO)) {
             saveEvent(dir, "", "ไม่ได้อนุญาตไมโครโฟน")
             return
         }
-        busy = true
-        status.text = "🎙️ พูดได้เลย: ทะเบียน จังหวัด ความผิด (กดอีกครั้งเพื่อจบ)"
-        voice.start(dir, { status.text = "⏳ กำลังแปลงเสียง…" }) { transcript, note ->
-            busy = false
-            saveEvent(dir, transcript, note)
+        handler.removeCallbacks(clearResult)
+        showingResult = false
+        showRecording(true)
+        voice.start(dir, {
+            showRecording(false)
+            status.text = "⏳ กำลังแปลงเสียง… กดบันทึกเหตุการณ์ใหม่ได้เลย"
+        }) { transcript, note -> saveEvent(dir, transcript, note) }
+    }
+
+    /** Yellow, pulsing button and a large yellow banner while the microphone is on. */
+    private fun showRecording(on: Boolean) {
+        pulse?.cancel()
+        pulse = null
+        catchBtn.alpha = 1f
+        if (on) {
+            catchBtn.setText(R.string.btn_recording)
+            catchBtn.backgroundTintList = ColorStateList.valueOf(0xE6FFC107.toInt())
+            catchBtn.setTextColor(Color.BLACK)
+            catchBtn.setShadowLayer(0f, 0f, 0f, 0)
+            catchBtn.textSize = 28f
+            status.text = "🎙️ พูดได้เลย: ทะเบียน จังหวัด ความผิด\nเงียบ 8 วินาทีจะจบเอง หรือกดอีกครั้งเพื่อจบ"
+            status.setBackgroundColor(0xE6FFC107.toInt())
+            status.setTextColor(Color.BLACK)
+            status.textSize = 20f
+            pulse = ObjectAnimator.ofFloat(catchBtn, "alpha", 1f, 0.55f).apply {
+                duration = 600
+                repeatMode = ValueAnimator.REVERSE
+                repeatCount = ValueAnimator.INFINITE
+                start()
+            }
+        } else {
+            catchBtn.setText(R.string.btn_catch)
+            catchBtn.backgroundTintList = ColorStateList.valueOf(0x8043A047.toInt())
+            catchBtn.setTextColor(Color.WHITE)
+            catchBtn.setShadowLayer(4f, 0f, 0f, 0x80000000.toInt())
+            catchBtn.textSize = 40f
+            status.setBackgroundColor(0x99000000.toInt())
+            status.setTextColor(Color.WHITE)
+            status.textSize = 16f
         }
     }
 
@@ -145,7 +198,13 @@ class MainActivity : AppCompatActivity() {
         }
         val parts = listOfNotNull(p.plate, p.province) + p.violations
         val shown = if (parts.isEmpty()) "บันทึกแล้ว" else "บันทึก " + parts.joinToString(" ")
-        status.text = "✅ $shown" + if (note.isNotEmpty()) "\n$note" else ""
-        if (ttsOk) tts?.speak(shown, TextToSpeech.QUEUE_FLUSH, null, "saved")
+        if (!voice.isRecording) {
+            status.text = "✅ $shown" + if (note.isNotEmpty()) "\n$note" else ""
+            showingResult = true
+            handler.removeCallbacks(clearResult)
+            handler.postDelayed(clearResult, 6_000)
+            // Never speak while the next note is being recorded: the mic would pick it up.
+            if (ttsOk) tts?.speak(shown, TextToSpeech.QUEUE_FLUSH, null, "saved")
+        }
     }
 }
