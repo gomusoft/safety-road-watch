@@ -7,6 +7,8 @@ Package `watch.saferoad`, minSdk 26, target/compile SDK 35, JDK 17.
 
 | File | Responsibility |
 |---|---|
+| `HomeActivity.kt` | Launcher screen (dark): big start button, library with event count, settings, and a one-line readiness check for camera / mic / GPS permissions (tap to ask). Opens the camera at once when the "open camera on start" setting is on |
+| `SettingsActivity.kt`, `Settings.kt` | Two choices kept in `SharedPreferences`, both off by default: address lookup from GPS (asks for consent first) and open the camera on start. Also shows the version |
 | `MainActivity.kt` | Dashcam screen. Permissions, capture button and hardware keys (`onKeyDown`), status text, TTS confirmation, saves the parsed result into the event |
 | `Recorder.kt` (class `Rolling`) | Rolling video: back camera, `VideoCapture<Recorder>` at HD, **no audio**. Records 10 s segments to `filesDir/ring/seg_<startMillis>.mp4`, keeps the newest 4. On trigger, moves recent segments into the event and keeps routing new segments there until trigger + 30 s |
 | `Voice.kt` | Voice note: `AudioRecord` 16 kHz mono PCM16 on a background thread, writes `voice.wav`; then transcribes the PCM with `SpeechRecognizer` + `RecognizerIntent.EXTRA_AUDIO_SOURCE` (API 33+), on-device recognizer if available |
