@@ -34,13 +34,15 @@ class Rolling(private val activity: AppCompatActivity, private val store: EventS
     private var curStart = 0L
     private val stopSegment = Runnable { current?.stop() }
 
-    private var activeDir: File? = null
-    private var deadline = 0L
+    /** Events still collecting "after" footage, each with the time its 30 s run out. Several can overlap. */
+    private class Active(val dir: File, val deadline: Long)
+
+    private val active = ArrayList<Active>()
 
     var onCollectEnd: (() -> Unit)? = null
     var onProblem: ((Int) -> Unit)? = null
 
-    val collecting: Boolean get() = activeDir != null
+    val collecting: Boolean get() = active.isNotEmpty()
 
     fun start(view: PreviewView) {
         if (started) return
@@ -73,17 +75,23 @@ class Rolling(private val activity: AppCompatActivity, private val store: EventS
         current?.stop()
     }
 
-    /** Returns the new event folder, or null if not ready or an event is already collecting. */
+    /** Returns the new event folder, or null if the camera is not ready. Works while an earlier event is still collecting. */
     fun trigger(): File? {
-        if (!running || activeDir != null) return null
+        if (!running) return null
         val now = System.currentTimeMillis()
         val dir = store.create(now)
+        // Footage that an earlier, still-collecting event already took out of the ring is copied, not shared.
+        for (a in active) {
+            a.dir.listFiles { f -> f.name.startsWith("clip_") && f.name.endsWith(".mp4") }?.forEach { f ->
+                val s = f.name.removePrefix("clip_").removeSuffix(".mp4").toLongOrNull()
+                if (s != null && s >= now - 35_000) f.copyTo(File(dir, f.name), true)
+            }
+        }
         ring.listFiles()?.forEach { f ->
             val s = startOf(f)
             if (s != null && s != curStart && s >= now - 35_000) moveTo(f, dir, s)
         }
-        activeDir = dir
-        deadline = now + 30_000
+        active.add(Active(dir, now + 30_000))
         return dir
     }
 
@@ -101,10 +109,7 @@ class Rolling(private val activity: AppCompatActivity, private val store: EventS
         val vc = videoCapture ?: return
         if (!running) return
         val start = System.currentTimeMillis()
-        if (activeDir != null && start >= deadline) {
-            activeDir = null
-            onCollectEnd?.invoke()
-        }
+        if (active.removeAll { start >= it.deadline } && active.isEmpty()) onCollectEnd?.invoke()
         val file = File(ring, "seg_$start.mp4")
         curStart = start
         current = vc.output.prepareRecording(activity, FileOutputOptions.Builder(file).build())
@@ -120,7 +125,7 @@ class Rolling(private val activity: AppCompatActivity, private val store: EventS
         // segment began. A stale one must not clear `current`, flip `running` or start a second recording.
         val mine = start == curStart
         if (mine) current = null
-        val dir = activeDir
+        val targets = active.filter { start < it.deadline }
         if (!file.exists() || file.length() == 0L) {
             file.delete()
             if (mine && error != VideoRecordEvent.Finalize.ERROR_NONE && running) {
@@ -128,8 +133,10 @@ class Rolling(private val activity: AppCompatActivity, private val store: EventS
                 onProblem?.invoke(error)
                 return
             }
-        } else if (dir != null && start < deadline) {
-            moveTo(file, dir, start)
+        } else if (targets.isNotEmpty()) {
+            // Every event still collecting gets this segment: copy to all but the last, move into the last.
+            targets.dropLast(1).forEach { file.copyTo(File(it.dir, "clip_$start.mp4"), true) }
+            moveTo(file, targets.last().dir, start)
         }
         if (mine && running) startSegment()
         // keep only the newest 4 finished segments

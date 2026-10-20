@@ -24,7 +24,7 @@ press / BT key ─┤ trigger
                 ▼
 filesDir/events/<yyyyMMdd_HHmmss>/
     clip_<startMillis>.mp4   ← ring segments from the last ~35 s, then new ones until +30 s
-    voice.wav                ← mic on only from the press until the second press or 12 s
+    voice.wav                ← mic on only from the press until the second press, 8 s of silence or 45 s
     event.json               ← time, lat/lon, transcript, plate, province, violations, km, road, tambon, amphoe, changwat, note
     merged.mp4               ← optional, made in the library
 ```

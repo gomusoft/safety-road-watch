@@ -65,7 +65,7 @@ Native Kotlin, Android Views, CameraX; no backend. Public repo, licence CC BY-NC
 - **Public repo:** never commit a real recording, voice note, photo, plate number, location, secret or key other than the
   committed debug keystore (public by design, debug only). `.gitignore` blocks media files; do not force-add them.
 - **Privacy:** the rolling dashcam video never records audio. The microphone is on only after the user presses capture,
-  until they press again or 12 s pass. Data stays on the device; the app uploads nothing.
+  until they press again, 8 s pass without speech, or 45 s pass. Data stays on the device; the app uploads nothing.
 - **Safety:** anything used while driving works with one big tap or a hardware key. While the camera screen is open the
   screen must never dim or lock.
 - **Scope:** KISS and YAGNI. Native Kotlin, Android Views, CameraX only. A new library needs a reason and a licence

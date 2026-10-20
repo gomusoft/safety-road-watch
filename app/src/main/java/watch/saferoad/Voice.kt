@@ -21,7 +21,10 @@ import java.io.FileOutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-/** Records the voice note (mic only while recording), writes voice.wav, then transcribes it. */
+/**
+ * Records the voice note (mic only while recording), writes voice.wav, then transcribes it.
+ * The note ends when the user presses again, after 8 s without speech, or after 45 s.
+ */
 class Voice(context: Context) {
     private val ctx = context.applicationContext
     private val main = Handler(Looper.getMainLooper())
@@ -53,12 +56,17 @@ class Voice(context: Context) {
                 )
                 check(ar.state == AudioRecord.STATE_INITIALIZED)
                 val buf = ByteArray(size)
-                val end = SystemClock.elapsedRealtime() + 12_000
+                val end = SystemClock.elapsedRealtime() + MAX_MS
+                val silence = SilenceDetector()
                 ar.startRecording()
                 FileOutputStream(pcm).use { out ->
                     while (isRecording && SystemClock.elapsedRealtime() < end) {
                         val n = ar.read(buf, 0, buf.size)
-                        if (n > 0) out.write(buf, 0, n) else if (n < 0) break
+                        if (n < 0) break
+                        if (n > 0) {
+                            out.write(buf, 0, n)
+                            if (silence.update(rms(buf, n), SystemClock.elapsedRealtime())) break
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -82,9 +90,24 @@ class Voice(context: Context) {
             }
             main.post {
                 onRecorded()
-                transcribe(pcm, onDone)
+                enqueue(pcm, onDone)
             }
         }.start()
+    }
+
+    // One recogniser at a time: a new note can be recorded while an earlier one is still being transcribed.
+    private val jobs = ArrayDeque<() -> Unit>()
+    private var transcribing = false
+
+    private fun enqueue(pcm: File, onDone: (String, String) -> Unit) {
+        jobs.addLast { transcribe(pcm) { text, note -> onDone(text, note); next() } }
+        if (!transcribing) next()
+    }
+
+    private fun next() {
+        val job = jobs.removeFirstOrNull()
+        transcribing = job != null
+        job?.invoke()
     }
 
     private fun writeWav(pcm: File, wav: File) {
@@ -166,5 +189,6 @@ class Voice(context: Context) {
 
     private companion object {
         const val RATE = 16000
+        const val MAX_MS = 45_000L
     }
 }
