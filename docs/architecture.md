@@ -68,6 +68,7 @@ Clip offsets shown in the library are computed from the clip file name against t
   - push of a tag `vX.Y.Z`: creates a versioned release whose notes are the matching section of `CHANGELOG.md`.
 - Branch model `dev-main`: work → `dev` (squash PR) → `main` (promotion PR, merge commit). The standard dev-pose
   release workflow (standard 10) is not built yet; see the roadmap.
+- `.github/workflows/sync-main.yml`: after any push to `main`, opens a PR `main` → `dev` (skipped when the trees are equal or a PR is open). Needs "Allow GitHub Actions to create and approve pull requests" in repo settings. PRs made with the built-in token do not start other workflows, so the `apk` check does not run on them.
 - `versionCode` = CI run number; `versionName` = the tag without `v`, or `dev.<run>` for untagged builds.
 - Process: [CONTRIBUTING.md](../CONTRIBUTING.md#releasing).
 

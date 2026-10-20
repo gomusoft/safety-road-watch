@@ -1,0 +1,36 @@
+name: sync-main
+
+# Keeps dev from drifting: whenever main changes (a promotion, a hotfix, or a direct edit), open a pull request
+# main → dev. Merge it with a merge commit. If it has conflicts, resolve them on a branch cut from dev.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write # needs Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"
+
+jobs:
+  pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch origin dev main
+          if git diff --quiet origin/dev origin/main; then
+            echo "dev already has everything that is on main"
+            exit 0
+          fi
+          open=$(gh pr list --base dev --head main --state open --json number --jq '.[0].number')
+          if [ -n "$open" ]; then
+            echo "PR #$open already open"
+            exit 0
+          fi
+          gh pr create --base dev --head main \
+            --title "chore(repo): merge main back into dev" \
+            --body "main changed, so dev needs it too. Merge with a **merge commit**. Opened by the sync-main workflow."

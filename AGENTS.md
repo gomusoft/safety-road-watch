@@ -27,7 +27,8 @@ Native Kotlin, Android Views, CameraX; no backend. Public repo, licence CC BY-NC
 - **Branch model: `dev-main`** (owner, 2026-10-20). `dev` is the default and integration branch; `main` holds what
   was promoted for release. Work branches start from the latest `dev` and are **squash-merged into `dev`** by PR.
   `dev` → `main` only by a promotion PR with a **merge commit** (release flow, standard 10, to be built when the owner
-  asks). Never commit, push, force-push or rebase on `dev` or `main`; run `git branch --show-current` before every commit.
+  asks). Anything that lands on `main` (a promotion, a `hotfix/main-<slug>`) must come back: the `sync-main` workflow
+  opens a PR `main` → `dev` after every push to `main`; merge it with a **merge commit**. Never commit, push, force-push or rebase on `dev` or `main`; run `git branch --show-current` before every commit.
 - **Branch names** (standard 02), lowercase kebab-case: `feature/<slug>`, `fix/<slug>`, `docs/<slug>`, `chore/<slug>`,
   hotfix `hotfix/main-<slug>`. No tool or agent prefixes such as `claude/`. Delete a branch after it merges.
 - **Lane:** `direct` (no server; the app is sideloaded by the owner). **Cost:** none. GitHub Actions minutes are free for
