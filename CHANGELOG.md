@@ -12,6 +12,7 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 - After merging clips the app says where the file is, shows it on the event card, and can save it to the gallery (Movies/SafetyRoadWatch, Android 10+).
 
 ### Changed
+- The library works in both portrait and landscape and turns with the phone, even if auto-rotate is locked, so you no longer have to rotate back and forth after capturing.
 - Library buttons are equal in size and have icons.
 - The capture button is now a soft, 50% transparent green with a shield instead of solid red.
 
@@ -24,6 +25,7 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 - หลังรวมคลิป แอปบอกว่าไฟล์อยู่ที่ไหน แสดงในการ์ดเหตุการณ์ และบันทึกลงแกลเลอรีได้ (Movies/SafetyRoadWatch, Android 10 ขึ้นไป)
 
 ### เปลี่ยน
+- คลังใช้ได้ทั้งแนวตั้งและแนวนอน หมุนตามเครื่อง แม้ปิดการหมุนอัตโนมัติไว้ ไม่ต้องหมุนเครื่องกลับไปมาหลังบันทึก
 - ปุ่มในคลังขนาดเท่ากันและมีไอคอน
 - ปุ่มบันทึกหน้ากล้องเป็นสีเขียวโปร่งแสง 50% มีรูปโล่ แทนสีแดงทึบ
 
