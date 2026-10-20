@@ -1,0 +1,10 @@
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+# Never commit real recordings, voice notes or plates.
+*.mp4
+*.wav
+*.pcm
+*.m4a

@@ -1,0 +1,42 @@
+name: apk
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: apk-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.14.3
+      - run: gradle --no-daemon testDebugUnitTest assembleDebug
+      - run: cp app/build/outputs/apk/debug/app-debug.apk safety-road-watch.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: safety-road-watch-apk
+          path: safety-road-watch.apk
+      # A fixed "latest" release so the phone can download the newest APK from one link.
+      - if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest safety-road-watch.apk --target "$GITHUB_SHA" \
+            --title "Latest build (${GITHUB_REF_NAME} ${GITHUB_SHA::7})" \
+            --notes "Debug APK built from ${GITHUB_REF_NAME} @ ${GITHUB_SHA::7}." --prerelease
