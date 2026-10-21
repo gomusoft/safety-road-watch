@@ -18,6 +18,7 @@ Chosen by a 1 to 5 poll (see the decision log in `docs/product.md`).
 
 ## Files and when to use them
 
+- `logo.svg`: a copy of the version in use. The README points to it, so it never needs editing when the version changes.
 - `svg/logo-vN.svg`: the master. Editable, sharp at any size. Use for the README, web, print and as the source for everything else.
 - `png/logo-vN-1024.png`: 1024 px export with rounded corners. Use for chat, social posts and any place that wants a picture file. Export other sizes from the SVG.
 - `android/vN/`: Android vector drawables for the same version: `ic_launcher_background.xml`, `ic_launcher_foreground.xml`, `ic_launcher_monochrome.xml` (themed icon) and `ic_logo.xml` (the plain logo for screens).

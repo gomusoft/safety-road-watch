@@ -3,7 +3,8 @@
 
 Run from the repo root:  python3 branding/build.py
 Outputs: branding/svg/logo-vN.svg and branding/android/vN/*.xml (N = 0..7).
-The app uses the version listed in ACTIVE; `--apply` copies its Android files into app/src/main/res.
+The app uses the version listed in ACTIVE; `--apply` copies its Android files into app/src/main/res
+and its SVG to branding/logo.svg (the file the README points to).
 Colours that are gradients in the SVG are flat approximations in the Android files (no aapt gradients,
 to keep the build simple); the launcher background keeps the gradient as a shape drawable.
 """
@@ -215,7 +216,8 @@ def main():
             shutil.copy(os.path.join(src, f), os.path.join(RES, "drawable", f))
         write(os.path.join(RES, "mipmap-anydpi-v26", "ic_launcher.xml"), LAUNCHER)
         write(os.path.join(RES, "mipmap-anydpi-v26", "ic_launcher_round.xml"), LAUNCHER)
-        print(f"applied v{ACTIVE} to app resources")
+        shutil.copy(os.path.join(ROOT, "svg", f"logo-v{ACTIVE}.svg"), os.path.join(ROOT, "logo.svg"))
+        print(f"applied v{ACTIVE} to app resources and branding/logo.svg")
     print("built", len(VERSIONS), "versions")
 
 
