@@ -1,5 +1,7 @@
 package watch.saferoad
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.SurfaceTexture
@@ -20,6 +22,7 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import java.io.File
 import java.io.FileOutputStream
@@ -40,6 +43,10 @@ class PlayerActivity : AppCompatActivity() {
     private var videoH = 0
     private var dragging = false
     private var ready = false
+
+    @Volatile
+    private var narrating = false
+    private lateinit var narrate: Button
     private val main = Handler(Looper.getMainLooper())
 
     private val tick = object : Runnable {
@@ -112,10 +119,24 @@ class PlayerActivity : AppCompatActivity() {
             minHeight = dp(48)
             setOnClickListener { captureStill() }
         }
+        narrate = Button(this).apply {
+            text = "อัดเสียงบรรยาย"
+            isAllCaps = false
+            minHeight = dp(48)
+            setOnClickListener { toggleNarration() }
+        }
+        val normalBg = narrate.background
+        narrate.tag = normalBg
+        val tools = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(capture, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT))
+            // Narration is placed on the merged video's timeline, so it is only offered there.
+            if (file.name == "merged.mp4") addView(narrate, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT))
+        }
         val root = FrameLayout(this).apply {
             addView(stage, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
             addView(bar, FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT, Gravity.BOTTOM))
-            addView(capture, FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.TOP or Gravity.END).apply { setMargins(dp(12), dp(12), dp(12), dp(12)) })
+            addView(tools, FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.TOP or Gravity.END).apply { setMargins(dp(12), dp(12), dp(12), dp(12)) })
         }
         setContentView(root)
 
@@ -146,7 +167,10 @@ class PlayerActivity : AppCompatActivity() {
                     seek.max = duration
                     start()
                 }
-                setOnCompletionListener { play.text = "เล่น" }
+                setOnCompletionListener {
+                    play.text = "เล่น"
+                    narrating = false // the recording ends with the video
+                }
                 setOnErrorListener { _, _, _ ->
                     Toast.makeText(this@PlayerActivity, "เล่นวิดีโอไม่ได้", Toast.LENGTH_SHORT).show()
                     finish()
@@ -211,6 +235,79 @@ class PlayerActivity : AppCompatActivity() {
                 Toast.makeText(this, if (ok) "บันทึกภาพแล้ว (มี $n ภาพในเหตุการณ์นี้)" else "จับภาพไม่ได้", Toast.LENGTH_SHORT).show()
             }
         }.start()
+    }
+
+    /**
+     * Records a spoken note over the merged video while it plays; the mic is on only between two presses of the
+     * button (or until the video ends, or 2 minutes). Then offers to put the note into the video.
+     */
+    private fun toggleNarration() {
+        if (narrating) {
+            narrating = false
+            return
+        }
+        val p = mp ?: return
+        if (!ready) return
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "ต้องอนุญาตไมค์ก่อน (เปิดหน้าแรกแล้วกดอนุญาต)", Toast.LENGTH_LONG).show()
+            return
+        }
+        if (!p.isPlaying) {
+            p.start()
+            play.text = "หยุด"
+        }
+        val startMs = p.currentPosition.toLong()
+        val dir = file.parentFile ?: return
+        narrating = true
+        narrate.text = "หยุดอัดเสียง"
+        narrate.setBackgroundColor(0xFFFFC107.toInt())
+        Thread {
+            val pcm = File(dir, "narration.pcm")
+            try {
+                Mic.record(pcm, 120_000L, { narrating })
+            } catch (ex: Exception) {
+            }
+            narrating = false
+            var saved = pcm.length() > 0
+            if (saved) {
+                try {
+                    pcmToWav(pcm, File(dir, "narration.wav"))
+                } catch (ex: Exception) {
+                    saved = false
+                }
+            }
+            pcm.delete()
+            runOnUiThread {
+                narrate.text = "อัดเสียงบรรยาย"
+                narrate.background = narrate.tag as android.graphics.drawable.Drawable?
+                if (isFinishing) return@runOnUiThread
+                if (saved) offerNarration(File(dir, "narration.wav"), startMs) else Toast.makeText(this, "อัดเสียงไม่สำเร็จ", Toast.LENGTH_SHORT).show()
+            }
+        }.start()
+    }
+
+    private fun offerNarration(wav: File, startMs: Long) {
+        AlertDialog.Builder(this)
+            .setMessage("ใส่เสียงที่อัดนี้ลงในวิดีโอเลยไหม? (เสียงเดิมในวิดีโอนี้จะถูกแทนที่)")
+            .setPositiveButton("ใส่เลย") { _, _ ->
+                release()
+                val tmp = File(file.parentFile, "merged_tmp.mp4")
+                Thread {
+                    val ok = try {
+                        Merge.concat(listOf(file), tmp, Narration(wav, startMs)) && tmp.renameTo(file)
+                    } catch (ex: Exception) {
+                        false
+                    }
+                    tmp.delete()
+                    wav.delete()
+                    runOnUiThread {
+                        Toast.makeText(this, if (ok) "ใส่เสียงแล้ว เปิดดูอีกครั้งเพื่อฟัง" else "ใส่เสียงไม่สำเร็จ", Toast.LENGTH_LONG).show()
+                        finish()
+                    }
+                }.start()
+            }
+            .setNegativeButton("ทิ้ง") { _, _ -> wav.delete() }
+            .show()
     }
 
     private fun release() {

@@ -29,6 +29,7 @@ one press, a short spoken note, keep driving. Review and send it after parking.
 2. **Privacy by design.**
    - The rolling dashcam video **never records audio**.
    - The microphone is on **only** after the user presses capture, until they press again, 8 s pass without speech, or 45 s pass.
+   - The one other use: "narrate" in the player, only between two presses of its button (max 2 min, ends with the video).
    - All data stays on the device. The app has no backend, no analytics, no account.
 3. **Report to authorities, never shame.** The app shares evidence to official channels. It never posts publicly.
 4. **Smallest thing that works (KISS, YAGNI).** The owner had a ~3M-token budget for the whole project.
@@ -88,3 +89,4 @@ one press, a short spoken note, keep driving. Review and send it after parking.
 | 2026-10-20 | Library: ticks on clips survive watching another clip; a single clip is deleted by swiping it sideways, with a confirm dialog (the owner merges at home, not while driving). Video stabilization is on by default and greyed out with a reason on phones that cannot do it. Next: still pictures and zoom in the player, voice choice when merging, then sender profile and recipient settings; the release key and release workflow come after | Owner |
 | 2026-10-20 | Voice note: cut engine rumble and vibration (speech-tuned mic source, the phone's noise suppression when present, 150 Hz high-pass) so speech is clearer and the 8 s silence detector is less fooled by car noise. Field test in a real car decides if more is needed | Owner |
 | 2026-10-20 | Player: own controls on a `TextureView` so it can zoom (pinch, double tap, pan); "จับภาพ" saves the frame at the current position at full video resolution as `still_<time>.jpg` in the event folder (several per event, listed in the library, opened full screen with zoom, deletable, attached when sharing). Choosing which frame by scrubbing is therefore covered | Owner |
+| 2026-10-20 | Merging asks whether to include the voice note (default yes, placed at the press time, encoded to AAC and muxed as an audio track) or leave it silent. Re-recording: a "narrate" button in the player of the merged video records a new note over the playing video (mic only between two presses, max 2 min) and can mux it in, replacing the old audio. The mic code moved to one place (`Mic`) with the noise filter | Owner |
