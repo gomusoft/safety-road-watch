@@ -9,6 +9,7 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.content.Intent
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -113,7 +114,18 @@ class SettingsActivity : AppCompatActivity() {
         }
         fun add(v: android.view.View) = box.addView(v, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply { bottomMargin = dp(12) })
 
-        add(label("ตั้งค่า", 24f, true))
+        add(
+            LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                val logo = ImageView(context).apply {
+                    setImageResource(R.drawable.ic_logo)
+                    importantForAccessibility = android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO
+                }
+                addView(logo, LinearLayout.LayoutParams(dp(40), dp(40)).apply { marginEnd = dp(12) })
+                addView(label("ตั้งค่า", 24f, true))
+            },
+        )
         add(
             setting(
                 "ดึงที่อยู่จาก GPS อัตโนมัติ (ใช้เน็ต)",
