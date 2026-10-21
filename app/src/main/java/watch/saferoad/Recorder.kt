@@ -58,10 +58,20 @@ class Rolling(private val activity: AppCompatActivity, private val store: EventS
                 Quality.HD,
                 FallbackStrategy.lowerQualityOrHigherThan(Quality.HD),
             )
-            val vc = VideoCapture.withOutput(CxRecorder.Builder().setQualitySelector(selector).build())
-            provider.unbindAll()
-            provider.bindToLifecycle(activity, CameraSelector.DEFAULT_BACK_CAMERA, preview, vc)
-            videoCapture = vc
+            val recorder = CxRecorder.Builder().setQualitySelector(selector).build()
+            fun bind(stabilize: Boolean): VideoCapture<CxRecorder> {
+                val vc = VideoCapture.Builder(recorder).setVideoStabilizationEnabled(stabilize).build()
+                provider.unbindAll()
+                provider.bindToLifecycle(activity, CameraSelector.DEFAULT_BACK_CAMERA, preview, vc)
+                return vc
+            }
+            val stabilize = Settings.stabilize(activity) && Stabilization.supported(provider)
+            videoCapture = try {
+                bind(stabilize)
+            } catch (ex: Exception) {
+                if (!stabilize) throw ex
+                bind(false) // the camera refused stabilization: record without it
+            }
             ring.listFiles()?.forEach { it.delete() } // stale pre-roll is useless
             running = true
             startSegment()

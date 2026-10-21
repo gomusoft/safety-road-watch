@@ -93,6 +93,25 @@ class SettingsActivity : AppCompatActivity() {
                 sw.isChecked = want
             },
         )
+        val stab = setting(
+            "กันภาพสั่น",
+            "ช่วยให้ภาพนิ่งขึ้นเมื่อใช้ขาตั้งหรือขับบนถนนขรุขระ ภาพอาจถูกตัดขอบเล็กน้อย มีผลเมื่อเปิดกล้องครั้งถัดไป",
+            Settings.stabilize(this),
+        ) { sw, want ->
+            Settings.setStabilize(this, want)
+            sw.isChecked = want
+        }
+        add(stab)
+        Stabilization.check(this) { ok ->
+            if (!ok && !isFinishing) {
+                stab.alpha = 0.5f
+                stab.isClickable = false
+                stab.setOnClickListener(null)
+                ((stab.getChildAt(0) as LinearLayout).getChildAt(1) as TextView).text =
+                    "เครื่องนี้ไม่รองรับ: กล้องหลักของเครื่องไม่มีโหมดกันภาพสั่นสำหรับวิดีโอ (พบบ่อยในมือถือราคาประหยัด) จึงปิดไว้"
+                (stab.getChildAt(1) as SwitchCompat).isChecked = false
+            }
+        }
 
         val version = packageManager.getPackageInfo(packageName, 0).versionName
         add(gray("เวอร์ชัน $version\nสัญญาอนุญาต CC BY-NC-SA 4.0 · ข้อมูลทั้งหมดอยู่ในเครื่องของคุณ"))
