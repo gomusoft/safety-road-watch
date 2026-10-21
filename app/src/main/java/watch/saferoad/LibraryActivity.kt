@@ -213,6 +213,7 @@ class LibraryActivity : AppCompatActivity() {
             button("แชร์", R.drawable.ic_share) { share(e, selected()) },
             button("ลบ", R.drawable.ic_delete) { confirmDelete(e) },
         ))
+        card.addView(row(button("ส่งรายงานให้หน่วยงาน", R.drawable.ic_share) { sendReport(e) }))
 
         val merged = File(e.dir, "merged.mp4")
         if (merged.exists()) {
@@ -433,21 +434,28 @@ class LibraryActivity : AppCompatActivity() {
             Toast.makeText(this, "ยังไม่ได้เลือกคลิป", Toast.LENGTH_SHORT).show()
             return
         }
-        val map = if (e.lat != null && e.lon != null) "https://maps.google.com/?q=${e.lat},${e.lon}" else ""
-        val place = (e.place.text() + " " + map).trim().ifEmpty { "-" }
-        val report = "แจ้งการกระทำผิดกฎจราจร\n" +
-            "วันเวลา: ${e.iso.replace('T', ' ')}\n" +
-            "ทะเบียน: ${e.plate ?: "-"} ${e.province ?: ""}\n" +
-            "ความผิด: ${e.violations.joinToString(", ")}\n" +
-            "สถานที่: $place"
-        val still = File(e.dir, "thumb.jpg").takeIf { it.exists() }
-        val captured = e.dir.listFiles { f -> f.name.startsWith("still_") && f.name.endsWith(".jpg") }?.sortedBy { it.name } ?: emptyList()
-        val pictures = listOfNotNull(still) + captured
+        val pictures = Report.pictures(e)
         val i = Intent(Intent.ACTION_SEND_MULTIPLE).setType(if (pictures.isNotEmpty()) "*/*" else "video/mp4")
             .putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList((pictures + send).map { uri(it) }))
-            .putExtra(Intent.EXTRA_TEXT, report)
+            .putExtra(Intent.EXTRA_TEXT, Report.text(this, e))
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivity(Intent.createChooser(i, "แชร์"))
+    }
+
+    /** Pick where to send the report; the guide for that way opens with this event's buttons. */
+    private fun sendReport(e: EventInfo) {
+        val all = Recipients.load(this)
+        if (all.isEmpty()) {
+            Toast.makeText(this, "อ่านรายการช่องทางไม่ได้", Toast.LENGTH_SHORT).show()
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle("ส่งรายงานให้ใคร")
+            .setItems(all.map { it.name }.toTypedArray()) { _, which ->
+                startActivity(Intent(this, GuideActivity::class.java).putExtra("id", all[which].id).putExtra("event", e.dir.path))
+            }
+            .setNegativeButton("ยกเลิก", null)
+            .show()
     }
 
     private fun confirmDeleteClip(f: File, label: String) {
