@@ -19,6 +19,7 @@ Package `watch.saferoad`, minSdk 26, target/compile SDK 35, JDK 17.
 | `LibraryActivity.kt` | Library UI built in code: cards per event, voice playback (`MediaPlayer`), clip playback via `FileProvider` + `ACTION_VIEW`, merge, share (`ACTION_SEND_MULTIPLE`), delete |
 | `PlayerActivity.kt` | In-app player: `VideoView` + `MediaController` for one clip or `merged.mp4` (path in the intent, no external app) |
 | `Thumb.kt` | The still picture of an event: the frame at the press moment (`MediaMetadataRetriever`), saved once as `thumb.jpg`, cached in memory. Library draws it on a background thread; share attaches it |
+| `res/drawable/ic_logo.xml`, `ic_launcher_*.xml`, `res/mipmap-anydpi-v26/` | The logo as vector drawables: adaptive launcher icon (background, foreground, monochrome for themed icons), and the plain logo used on the home and settings screens. Generated from `branding/` (see its README), never edited by hand |
 | `Merge.kt` | Concatenates MP4 clips without re-encoding: `MediaExtractor` → `MediaMuxer`, shifting timestamps |
 
 ## Flow

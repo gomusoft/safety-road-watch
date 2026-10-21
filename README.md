@@ -1,8 +1,10 @@
-# Safety Road Watch
+<p align="center"><img src="branding/logo.svg" width="128" height="128" alt="โลโก้ Safety Road Watch โล่ขาวมีถนนบนพื้นเขียว"></p>
+
+<h1 align="center">Safety Road Watch</h1>
+
+<p align="center"><b>ถนนที่ปลอดภัย เริ่มจากคนธรรมดาที่ไม่นิ่งเฉย</b></p>
 
 Lane: `direct` · Cost: none (no server; GitHub Actions is free for public repos)
-
-**ถนนที่ปลอดภัย เริ่มจากคนธรรมดาที่ไม่นิ่งเฉย**
 
 ทุกวันบนถนนเมืองไทยเราเห็นรถฝ่าไฟแดง ปาดเส้นทึบ ปล่อยควันดำ หรือดัดแปลงล้อจนล้นตัวถัง
 แล้วส่วนใหญ่ก็ทำได้แค่บ่นแล้วขับต่อไป เพราะการเก็บหลักฐานยุ่งยากและอันตรายถ้าต้องหยิบมือถือ
