@@ -18,6 +18,7 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
@@ -73,6 +74,16 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnLibrary).setOnClickListener {
             startActivity(Intent(this, LibraryActivity::class.java))
         }
+        findViewById<android.widget.ImageButton>(R.id.btnSettings).setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
+        // Back always reaches the home screen, even when the camera was the only screen (app opened straight into it).
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (isTaskRoot) startActivity(Intent(this@MainActivity, HomeActivity::class.java).putExtra(HomeActivity.STAY, true))
+                finish()
+            }
+        })
         tts = TextToSpeech(this) {
             if (it == TextToSpeech.SUCCESS) {
                 ttsOk = tts?.setLanguage(Locale.forLanguageTag("th-TH")) != TextToSpeech.LANG_MISSING_DATA

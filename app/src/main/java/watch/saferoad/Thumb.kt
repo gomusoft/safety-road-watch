@@ -12,22 +12,59 @@ object Thumb {
     private val cache = LruCache<String, Bitmap>(12)
     private val small = LruCache<String, Bitmap>(80)
 
-    /** First frame of any clip or merged video, small, kept in memory only. Blocking: call off the main thread. */
+    /** The small picture if it is already in memory, so the library can show it at once without a grey flash. */
+    fun peek(f: File): Bitmap? = small.get("${f.path}:${f.lastModified()}")
+
+    /** The card picture of an event if it is already in memory. */
+    fun peekCard(e: EventInfo): Bitmap? = cache.get(e.dir.name)
+
+    /**
+     * A frame of a video. The phone's video decoder can be busy (right after the player or a merge) and then gives
+     * nothing, so try a few times before giving up. Blocking.
+     */
+    private fun frame(f: File, us: Long, option: Int): Bitmap? {
+        for (i in 0..2) {
+            val r = MediaMetadataRetriever()
+            try {
+                r.setDataSource(f.path)
+                r.getFrameAtTime(us, option)?.let { return it }
+            } catch (ex: Exception) {
+            } finally {
+                r.release()
+            }
+            if (i < 2) {
+                try {
+                    Thread.sleep(400L * (i + 1))
+                } catch (ex: InterruptedException) {
+                    return null
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * First frame of any clip or merged video, small. Kept in memory and as a small file next to the video (so it is
+     * there again after the app was closed and while the decoder is busy). Blocking: call off the main thread.
+     */
     fun first(f: File): Bitmap? {
         val key = "${f.path}:${f.lastModified()}"
         small.get(key)?.let { return it }
-        val r = MediaMetadataRetriever()
-        return try {
-            r.setDataSource(f.path)
-            val raw = r.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC) ?: return null
-            val bmp = if (raw.width > 320) Bitmap.createScaledBitmap(raw, 320, raw.height * 320 / raw.width, true) else raw
-            small.put(key, bmp)
-            bmp
-        } catch (ex: Exception) {
-            null
-        } finally {
-            r.release()
+        val disk = File(f.path + ".jpg")
+        if (disk.exists() && disk.lastModified() >= f.lastModified()) {
+            BitmapFactory.decodeFile(disk.path)?.let {
+                small.put(key, it)
+                return it
+            }
         }
+        val raw = frame(f, 0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC) ?: return null
+        val bmp = if (raw.width > 320) Bitmap.createScaledBitmap(raw, 320, raw.height * 320 / raw.width, true) else raw
+        try {
+            FileOutputStream(disk).use { bmp.compress(Bitmap.CompressFormat.JPEG, 80, it) }
+        } catch (ex: Exception) {
+        }
+        small.put(key, bmp)
+        return bmp
     }
 
     /** A captured still picture, shrunk for the library strip. Blocking: call off the main thread. */
@@ -56,21 +93,16 @@ object Thumb {
         // The clip that was recording at the press; until it has arrived, show the first one but do not keep it.
         val exact = clips.lastOrNull { startOf(it)!! <= e.time }
         val clip = exact ?: clips.firstOrNull() ?: return null
-        val r = MediaMetadataRetriever()
-        return try {
-            r.setDataSource(clip.path)
-            val us = if (exact != null) (e.time - startOf(clip)!!) * 1000 else 0L
-            val raw = r.getFrameAtTime(us, MediaMetadataRetriever.OPTION_CLOSEST) ?: return null
-            val bmp = if (raw.width > 720) Bitmap.createScaledBitmap(raw, 720, raw.height * 720 / raw.width, true) else raw
-            if (exact != null) {
+        val us = if (exact != null) (e.time - startOf(clip)!!) * 1000 else 0L
+        val raw = frame(clip, us, MediaMetadataRetriever.OPTION_CLOSEST) ?: return null
+        val bmp = if (raw.width > 720) Bitmap.createScaledBitmap(raw, 720, raw.height * 720 / raw.width, true) else raw
+        if (exact != null) {
+            try {
                 FileOutputStream(saved).use { bmp.compress(Bitmap.CompressFormat.JPEG, 85, it) }
                 cache.put(e.dir.name, bmp)
+            } catch (ex: Exception) {
             }
-            bmp
-        } catch (ex: Exception) {
-            null
-        } finally {
-            r.release()
         }
+        return bmp
     }
 }

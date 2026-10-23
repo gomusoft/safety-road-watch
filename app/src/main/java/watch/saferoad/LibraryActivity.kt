@@ -130,7 +130,8 @@ class LibraryActivity : AppCompatActivity() {
                 setOnClickListener { playClip(File(e.dir, "merged.mp4").takeIf { it.exists() } ?: clips.first()) }
             }
             card.addView(pic, LinearLayout.LayoutParams(MATCH_PARENT, dp(180)).apply { topMargin = dp(4); bottomMargin = dp(8) })
-            pool.execute {
+            val ready = Thumb.peekCard(e)
+            if (ready != null) pic.setImageBitmap(ready) else pool.execute {
                 val bmp = Thumb.load(e)
                 if (bmp != null) runOnUiThread { if (!isFinishing) pic.setImageBitmap(bmp) }
             }
@@ -177,7 +178,8 @@ class LibraryActivity : AppCompatActivity() {
                     setOnClickListener {
                         startActivity(Intent(this@LibraryActivity, ImageActivity::class.java).putExtra("path", f.path).putExtra("deletable", true))
                     }
-                    pool.execute {
+                    val ready = Thumb.peek(f)
+                    if (ready != null) setImageBitmap(ready) else pool.execute {
                         val bmp = Thumb.still(f)
                         if (bmp != null) runOnUiThread { if (!isFinishing) setImageBitmap(bmp) }
                     }
@@ -233,7 +235,8 @@ class LibraryActivity : AppCompatActivity() {
         scaleType = ImageView.ScaleType.CENTER_CROP
         setBackgroundColor(0xFFCCCCCC.toInt())
         setOnClickListener { playClip(f) }
-        pool.execute {
+        val ready = Thumb.peek(f)
+        if (ready != null) setImageBitmap(ready) else pool.execute {
             val bmp = Thumb.first(f)
             if (bmp != null) runOnUiThread { if (!isFinishing) setImageBitmap(bmp) }
         }
@@ -452,6 +455,7 @@ class LibraryActivity : AppCompatActivity() {
             .setMessage("ลบคลิป $label นี้? กู้คืนไม่ได้ (วิดีโอที่รวมไว้แล้วไม่หาย)")
             .setPositiveButton("ลบ") { _, _ ->
                 f.delete()
+                File(f.path + ".jpg").delete() // its small picture
                 skipped.remove(f.path)
                 render()
             }

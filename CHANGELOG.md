@@ -41,6 +41,9 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 
 ### Fixed
 - The camera screen now keeps the screen on and shows over the lock screen, and recording restarts cleanly after the screen was off or after the library.
+- A merged video that has a voice now plays from the very beginning and can be sought back to the start (it used to open in the middle and refuse to go back).
+- Pictures in the library no longer turn into grey boxes after watching a clip or merging: the first-frame pictures are kept as small files next to the videos, shown at once when already known, and retried when the phone's video decoder is busy.
+- With "open camera on start" on, there was no way to reach the home screen and settings. The camera screen now has a settings button next to the library button, and Back from the camera always goes to the home screen, even when the camera was the only screen.
 
 ### เพิ่ม
 - ดูคลิปและวิดีโอที่รวมแล้วในแอปได้เลย ไม่ต้องใช้แอปวิดีโออื่น
@@ -77,6 +80,9 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 
 ### แก้ไข
 - หน้ากล้องเปิดจอค้างไว้และแสดงทับหน้าจอล็อกได้ และอัดต่อได้ถูกต้องหลังจอดับหรือกลับจากคลัง
+- วิดีโอที่รวมแล้วและมีเสียงเล่นจากวินาทีแรกได้ และเลื่อนย้อนกลับไปต้นคลิปได้ (เดิมเปิดมากลางคลิปและย้อนกลับไม่ได้)
+- รูปในคลังไม่กลายเป็นกล่องสีเทาอีกหลังไปดูคลิปหรือรวมคลิป: รูปภาพแรกของคลิปเก็บเป็นไฟล์เล็กๆ ข้างวิดีโอ แสดงทันทีถ้ามีอยู่แล้ว และลองใหม่เมื่อตัวถอดวิดีโอของเครื่องไม่ว่าง
+- เมื่อเปิด "เปิดกล้องทันทีเมื่อเปิดแอป" ไม่มีทางไปหน้าแรกและตั้งค่าได้ ตอนนี้หน้ากล้องมีปุ่มตั้งค่าข้างปุ่มคลัง และกดย้อนกลับจากกล้องจะไปหน้าแรกเสมอ แม้กล้องเป็นหน้าเดียวในแอป
 
 ## [0.1.0] - 2026-10-20
 
