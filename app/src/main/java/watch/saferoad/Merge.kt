@@ -21,7 +21,7 @@ object Merge {
     fun concat(files: List<File>, out: File, voice: Narration? = null): Boolean {
         require(files.isNotEmpty())
         val encoded = try {
-            voice?.let { encodeAac(it.wav) }
+            voice?.let { encodeAac(it.wav, it.offsetMs) }
         } catch (e: Exception) {
             null
         }
@@ -72,9 +72,11 @@ object Merge {
                 }
             }
             check(track >= 0) { "no video track" }
-            if (encoded != null && voice != null) {
+            if (encoded != null) {
+                // The audio runs from time 0 (silence before the voice), like the video, and stops where the video stops.
                 for ((bytes, i) in encoded.samples) {
-                    info.set(0, bytes.size, i.presentationTimeUs + voice.offsetMs * 1000L, i.flags)
+                    if (i.presentationTimeUs >= offset) break
+                    info.set(0, bytes.size, i.presentationTimeUs, i.flags)
                     muxer.writeSampleData(audioTrack, ByteBuffer.wrap(bytes), info)
                 }
             }
@@ -93,11 +95,17 @@ object Merge {
 
     private class Encoded(val format: MediaFormat, val samples: List<Pair<ByteArray, MediaCodec.BufferInfo>>)
 
-    /** Encodes a 16 kHz mono WAV (44-byte header) to AAC-LC in memory: a note is at most a minute, so it stays small. */
-    private fun encodeAac(wav: File): Encoded {
+    /**
+     * Encodes a 16 kHz mono WAV (44-byte header) to AAC-LC in memory: a note is at most a minute, so it stays small.
+     * [leadMs] of silence is put in front, so the audio track starts at time 0 like the video track. (A track that
+     * starts late made the merged video open in the middle and refuse to seek back to the beginning.)
+     */
+    private fun encodeAac(wav: File, leadMs: Long): Encoded {
         val rate = Voice.RATE
         val all = wav.readBytes()
-        val pcm = all.copyOfRange(minOf(44, all.size), all.size)
+        val voice = all.copyOfRange(minOf(44, all.size), all.size)
+        val lead = ByteArray((leadMs.coerceAtLeast(0) * rate / 1000).toInt() * 2)
+        val pcm = lead + voice
         val format = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, rate, 1).apply {
             setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
             setInteger(MediaFormat.KEY_BIT_RATE, 64_000)

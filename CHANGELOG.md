@@ -39,6 +39,7 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 
 ### Fixed
 - The camera screen now keeps the screen on and shows over the lock screen, and recording restarts cleanly after the screen was off or after the library.
+- A merged video that has a voice now plays from the very beginning and can be sought back to the start (it used to open in the middle and refuse to go back).
 
 ### เพิ่ม
 - ดูคลิปและวิดีโอที่รวมแล้วในแอปได้เลย ไม่ต้องใช้แอปวิดีโออื่น
@@ -73,6 +74,7 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 
 ### แก้ไข
 - หน้ากล้องเปิดจอค้างไว้และแสดงทับหน้าจอล็อกได้ และอัดต่อได้ถูกต้องหลังจอดับหรือกลับจากคลัง
+- วิดีโอที่รวมแล้วและมีเสียงเล่นจากวินาทีแรกได้ และเลื่อนย้อนกลับไปต้นคลิปได้ (เดิมเปิดมากลางคลิปและย้อนกลับไม่ได้)
 
 ## [0.1.0] - 2026-10-20
 
