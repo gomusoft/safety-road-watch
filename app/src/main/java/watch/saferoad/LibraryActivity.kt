@@ -445,20 +445,9 @@ class LibraryActivity : AppCompatActivity() {
         startActivity(Intent.createChooser(i, "แชร์"))
     }
 
-    /** Pick where to send the report; the guide for that way opens with this event's buttons. */
+    /** Opens the sending guide for this event: the agencies grouped by violation, the matching ones first. */
     private fun sendReport(e: EventInfo) {
-        val all = Recipients.load(this)
-        if (all.isEmpty()) {
-            Toast.makeText(this, "อ่านรายการช่องทางไม่ได้", Toast.LENGTH_SHORT).show()
-            return
-        }
-        AlertDialog.Builder(this)
-            .setTitle("ส่งรายงานให้ใคร")
-            .setItems(all.map { it.name }.toTypedArray()) { _, which ->
-                startActivity(Intent(this, GuideActivity::class.java).putExtra("id", all[which].id).putExtra("event", e.dir.path))
-            }
-            .setNegativeButton("ยกเลิก", null)
-            .show()
+        startActivity(Intent(this, GuideActivity::class.java).putExtra("event", e.dir.path))
     }
 
     private fun confirmDeleteClip(f: File, label: String) {

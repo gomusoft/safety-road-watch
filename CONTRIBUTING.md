@@ -45,6 +45,7 @@ The "send report" guide (Library → "ส่งรายงานให้หน
   the report and files attached) or `phone` (opens the dialer). Only list **official** channels, and never a link that
   arrived by SMS or LINE: fake DLT and police messages circulate. Write `verified` honestly (what you saw, when) and
   set `checked` to today's date. Unverified details stay marked as unverified.
+- The `violations` array in the same file says which agency takes which kind of violation (`labels` are matched against what the voice note found; `channels` are recipient ids). Add a group or move a violation when an agency confirms it.
 - The research notes live in `docs/guide/channels.md` and `docs/reporting-channels.md`; update them with the same PR.
 - Screenshots (optional but wanted): open the real page on a phone-sized screen (about 390 x 844), take one picture per
   step, put it in `app/src/main/assets/guide/<id>-<step>.png`, and list the file names in the entry's `images` array
