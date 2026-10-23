@@ -33,7 +33,7 @@ class HomeActivity : AppCompatActivity() {
         }
         readiness.setOnClickListener { if (missing().isNotEmpty()) askPermissions.launch(PERMISSIONS) }
         // Only on a fresh start, so coming back from the camera or a rotation does not reopen it.
-        if (savedInstanceState == null && Settings.autoStart(this)) startRecording()
+        if (savedInstanceState == null && !intent.getBooleanExtra(STAY, false) && Settings.autoStart(this)) startRecording()
     }
 
     override fun onResume() {
@@ -64,8 +64,10 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private companion object {
-        val PERMISSIONS = arrayOf(
+    companion object {
+        /** Extra: show the home screen even when "open camera on start" is on (used when leaving the camera). */
+        const val STAY = "stay"
+        private val PERMISSIONS = arrayOf(
             Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,
             Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
         )
