@@ -68,6 +68,33 @@ browser, mail app or LINE with a URL the user sees first).
 - **Checked:** 2026-10-20. **Confidence:** login page = verified; field list and steps = unverified.
 - **Screenshots:** none (host blocked).
 
+### Update 2026-11-04: what a public how-to says about this system (third-party, unverified)
+
+Source: a social-media post by the page "Connect the Dots" (#CTD, #connectthedotsth), pasted by the owner. It is not
+an official page, so every point below is **unverified** until DLT (1584) confirms it. It matches what was seen
+on 2026-10-20 (the login page exists) and changes the scope guess made then.
+
+- **Why this channel:** the post says reports sent through the DLT LINE `1584dlt` used to work, but many people
+  report that nobody reads or answers them any more and no reward arrives; the recompense site is the system
+  made specifically for reward claims.
+- **Scope:** "all vehicle types": cars, motorcycles, public-transport vehicles, etc. This **contradicts the
+  earlier note** (private cars: only vehicle-condition offences). The form has a violation-type list to choose
+  from; whether private-car driving offences such as red lights are among them is **not stated**. Ask 1584.
+- **Steps given:**
+  1. Register and verify identity with **ThaID**; upload a **copy of the ID card** and the **bank-book page**.
+     Wait for DLT staff to confirm the registration (notice by **e-mail**).
+  2. Log in, choose the **vehicle type**, enter the **plate** exactly.
+  3. Choose the **violation type** shown by the evidence; describe the event briefly; date and time; place in
+     as much detail as possible, at least **road, tambon, amphoe, province**.
+  4. Upload picture or video evidence in which the offending vehicle is clearly visible; files **small**, video
+     **not too long**.
+  5. Check and submit. Track the status on the site. When a case ends and the fine is settled, DLT transfers the
+     reward and sends an SMS.
+- **Time:** some cases take **months**; if the offender fights it, the case may go to court and take longer.
+- **App changes made from this:** `recipients.json` entry `dlt-reward` rewritten with these steps and marked
+  "third-party source, 2026-11-04"; the driving, area-ban and parking groups now list `dlt-reward` first and the
+  police 1197 entry second.
+
 ## 2. DLT complaint web (ins.dlt.go.th/cmpweb)
 
 - **URL:** https://ins.dlt.go.th/cmpweb/ - title "รับและตรวจสอบเรื่องร้องเรียนรถโดยสารสาธารณะ". Text seen
@@ -158,7 +185,7 @@ browser, mail app or LINE with a URL the user sees first).
 
 ## Open questions for the owner (phone 1584 / 1197)
 
-1. 1584: is `recompense.dlt.go.th` the only channel for a reward claim now? Do LINE @1584DLT and the e-mail
+1. 1584: is `recompense.dlt.go.th` the only channel for a reward claim now, and does it take driving offences of private cars (red light, solid line) or only vehicle and transport offences? (a 2026 how-to says all vehicle types) Do LINE @1584DLT and the e-mail
    still accept reports? Which offences does DLT take (private-car driving offences are not DLT's)?
 2. 1584: attachment types and size limit on recompense.dlt.go.th; is a copy of ID and bank book required at
    registration? Can ThaID replace it?

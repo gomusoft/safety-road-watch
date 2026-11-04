@@ -27,6 +27,7 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 - The report guide now says which agency takes which violation (vehicle condition and black smoke, dangerous driving, area bans, parking, public transport and trucks), with the agencies that fit the violations found in an event shown first. The table is in `recipients.json`.
 
 ### Changed
+- Report guide: the DLT reward system now lists what to prepare (ID card and bank-book copies, ThaID registration and staff approval before the first report), the form fields (vehicle type, plate, violation type, road/tambon/amphoe/province), small files and short videos, and that a case can take months. It covers all vehicle types, so the DLT reward system is now offered first for driving offences too, next to the police 1197 entry. Source: a public how-to by the page "Connect the Dots", not yet confirmed with DLT.
 - The in-app player has its own play/pause button and a seek bar.
 - Clips you untick in the library stay unticked after you watch another clip and come back.
 - The voice note filters out engine rumble and road vibration, and uses the phone's own noise suppression when it has it, so your voice is easier to hear and to transcribe in a noisy car.
@@ -66,6 +67,7 @@ The section for a tag `vX.Y.Z` becomes that GitHub release's notes, so write it 
 - คู่มือส่งรายงานบอกว่าความผิดแต่ละแบบส่งที่หน่วยงานไหน (สภาพรถและควันดำ พฤติกรรมขับขี่อันตราย ข้อห้ามพื้นที่ การจอดรถ รถโดยสารและรถบรรทุก) และแสดงหน่วยงานที่ตรงกับความผิดที่พบในเหตุการณ์ไว้ก่อน ตารางอยู่ในไฟล์ `recipients.json`
 
 ### เปลี่ยน
+- คู่มือรายงาน: ระบบขอรับเงินสินบนของกรมการขนส่งทางบกบอกสิ่งที่ต้องเตรียมแล้ว (สำเนาบัตรประชาชนและหน้าสมุดบัญชี ลงทะเบียนผ่าน ThaID และรอเจ้าหน้าที่อนุมัติก่อนส่งเรื่องแรก) ช่องที่ต้องกรอก (ประเภทรถ ทะเบียน ประเภทความผิด ถนน ตำบล อำเภอ จังหวัด) ไฟล์เล็กและวิดีโอสั้น และบอกว่าบางเรื่องใช้เวลาหลายเดือน ระบบนี้รับรถทุกประเภท จึงแสดงเป็นตัวเลือกแรกของความผิดการขับขี่ด้วย คู่กับตำรวจ 1197 ที่มา: โพสต์แนะนำของเพจ Connect the Dots ยังไม่ได้ยืนยันกับกรมฯ
 - เครื่องเล่นในแอปมีปุ่มเล่น/หยุดและแถบเลื่อนของตัวเอง
 - คลิปที่เอาติ๊กออกในคลังยังคงไม่ติ๊กหลังไปดูคลิปอื่นแล้วกลับมา
 - เสียงบันทึกตัดเสียงเครื่องยนต์และเสียงสั่นของถนนออก และใช้ตัวลดเสียงรบกวนของเครื่องถ้ามี ทำให้ได้ยินเสียงพูดชัดขึ้นและถอดเสียงได้ดีขึ้นในรถที่เสียงดัง
